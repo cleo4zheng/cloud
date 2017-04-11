@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.RoleMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.foros.Role">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="domain_id" property="domain_id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+    </resultMap>
+ 
+    <sql id="all_fields">
+        id,domain_id,name
+	</sql>  
+	
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from os_roles where id=#{id}
+    </select>
+    
+    <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from os_roles where name=#{name}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.foros.Role">
+		insert into os_roles ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{domain_id}, #{name}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into os_roles (<include refid="all_fields" /> )   
+       values  
+       (#{id}, #{domain_id},#{name})  
+        ON DUPLICATE KEY UPDATE
+        domain_id=#{domain_id},name=#{name}
+	</insert>
+	
+	<update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into os_roles (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id},#{item.domain_id}, #{item.name})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       domain_id = VALUES(domain_id),name = VALUES(name)
+    </update>
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.foros.Role">
+        update os_roles set domain_id = #{domain_id}, name = #{name}
+        where id = #{id}
+    </update>
+     
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from os_roles where id = #{id}
+	</delete>
+	
+<!-- selt dao -->	
+    <select id="countNum" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select count(*) as num from os_roles where id = #{id}
+	</select>
+	
+    <select id="selectList" resultMap="BaseResultMap"> 
+     select <include refid="all_fields" /> from os_roles order by id desc
+    </select>
+
+</mapper>

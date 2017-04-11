@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.TemplateVersionMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.rating.TemplateVersion">
+	    <result column="version_id" property="version_id" jdbcType="VARCHAR" />
+	    <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <result column="template_id" property="template_id" jdbcType="VARCHAR" />
+        <result column="ccy_id" property="ccy_id" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        version_id,name, description,template_id,ccy_id
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.rating.TemplateVersion">
+		insert into template_versions ( <include refid="all_fields" /> )
+		values (
+		#{version_id},#{name}, #{description},#{template_id},#{ccy_id}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into template_versions (<include refid="all_fields" /> )   
+       values  
+       (#{version_id},#{name},#{description},#{template_id},#{ccy_id})  
+       ON DUPLICATE KEY UPDATE
+       name = #{name},description = #{description},template_id=#{template_id},ccy_id = #{ccy_id}
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.rating.TemplateVersion">
+        update template_versions set name = #{name},description = #{description},template_id=#{template_id},ccy_id = #{ccy_id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from template_versions where version_id =#{version_id}
+	</delete>
+	
+	<delete id= "deleteByTemplateId" parameterType="java.lang.String">
+       delete from template_versions where template_id =#{template_id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from template_versions
+	</select>
+	
+	<select id="selectByTemplateId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from template_versions where template_id=#{template_id}
+    </select>
+    
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from template_versions where version_id=#{version_id}
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from template_versions 
+    </select>
+    
+</mapper>

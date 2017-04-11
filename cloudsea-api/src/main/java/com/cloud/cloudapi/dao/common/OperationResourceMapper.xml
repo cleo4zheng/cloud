@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.OperationResourceMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.OperationResource">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="operation_id" property="operationId" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="all_fields">
+        id,operation_id,name,type
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from resources where id=#{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.OperationResource">
+		insert into resources ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{operationId}, #{name}, #{type}
+		)
+	</insert>
+	
+   <insert id="insertOrUpdate">
+       insert into resources (<include refid="all_fields" /> )   
+       values  
+       (#{id}, #{operationId}, #{name}, #{type})  
+        ON DUPLICATE KEY UPDATE
+        operation_id = #{operationId}, name = #{name},type = #{type}
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.OperationResource">
+        update resources set operation_id = #{operationId}, name = #{name},type = #{type}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from resources where id =#{id}
+	</delete>
+	
+	 <delete id="deleteByOperationsId">
+     delete from resources
+	 where operation_id in
+       <foreach collection="list" item="id" open="(" close=")" separator=",">
+         #{id}
+       </foreach>
+    </delete>
+    
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from resources
+	</select>
+	
+	<select id="selectResourcesByOperationId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from resources  where operation_id = #{operationId}
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from resources 
+    </select>
+    
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from resources limit #{0}, #{1}
+    </select>    
+
+</mapper>

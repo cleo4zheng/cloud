@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.ContainerMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.Container">
+	    <result column="id" property="uuid" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="stack_id" property="stack_id" jdbcType="VARCHAR" />
+        <result column="baymodel_id" property="baymodel_id" jdbcType="VARCHAR" />
+        <result column="master_count" property="master_count" jdbcType="INTEGER" />
+        <result column="node_count" property="node_count" jdbcType="INTEGER" />
+        <result column="api_address" property="api_address" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+        <result column="core" property="core" jdbcType="INTEGER" />
+        <result column="ram" property="ram" jdbcType="INTEGER" />
+        <result column="system_volume" property="systemVolumeSize" jdbcType="INTEGER" />
+        <result column="system_volume_type" property="systemVolumeType" jdbcType="VARCHAR" />
+        <result column="data_volume" property="dataVolumeSize" jdbcType="INTEGER" />
+        <result column="data_volume_type" property="dataVolumeType" jdbcType="VARCHAR" />
+        <result column="image_id" property="imageId" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id, name, status, stack_id, baymodel_id, master_count, node_count, api_address, tenant_id, million_seconds, core, ram, system_volume, system_volume_type,
+        data_volume, data_volume_type, image_id
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from containers where id=#{uuid}
+    </select>
+    
+    <select id="selectByIds" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from containers e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Container">
+		insert into containers ( <include refid="all_fields" /> )
+		values (
+		#{uuid}, #{name}, #{status}, #{stack_id}, #{baymodel_id}, #{master_count}, #{node_count}, #{api_address}, #{tenantId}, #{millionSeconds},
+		#{core}, #{ram}, #{systemVolumeSize}, #{systemVolumeType}, #{dataVolumeSize}, #{dataVolumeType}, #{imageId}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Container">
+        update containers set name = #{name}, status = #{status}, stack_id = #{stack_id}, baymodel_id = #{baymodel_id}, master_count = #{master_count},
+        node_count = #{node_count}, api_address = #{api_address}, tenant_id = #{tenantId}, million_seconds = #{millionSeconds}, core = #{core},
+        ram = #{ram}, system_volume = #{systemVolumeSize}, system_volume_type = #{systemVolumeType}, data_volume = #{dataVolumeSize},
+        data_volume_type = #{dataVolumeType}, image_id = #{imageId}
+        where id = #{uuid}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from containers where id =#{uuid}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from containers
+	</select>
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from containers 
+    </select>
+    
+    <select id="selectAllByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from containers where tenant_id = #{tenantId}
+    </select>
+    
+    <select id="selectListWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from containers limit #{limit}
+    </select>
+    
+    <select id="selectAllByTenantIdWithLimit" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from containers where tenant_id = #{0} limit #{1}
+    </select>
+    
+    <select id="countNumByContainereStatus" resultType="java.lang.Integer" parameterType="java.lang.String">
+	  select count(*) as num from containers where status =#{status}
+	</select>
+     
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from containers  limit #{0}, #{1}
+    </select>    
+
+</mapper>

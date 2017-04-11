@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.CloudUserMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.common.CloudUser">
+	    <result column="userid" property="userid" jdbcType="VARCHAR" />
+        <result column="account" property="account" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="os_user_id" property="osUserId" jdbcType="VARCHAR" />
+        <result column="mail" property="mail" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="company" property="company" jdbcType="VARCHAR" />
+        <result column="customer_manager" property="customerManager" jdbcType="VARCHAR" />
+        <result column="enabled" property="enabled" jdbcType="BOOLEAN" />
+        <result column="currentregion" property="currentregion" jdbcType="VARCHAR" />
+        <result column="locale" property="locale" jdbcType="VARCHAR" />
+        <result column="template" property="templateId" jdbcType="VARCHAR" />
+        <result column="version" property="version" jdbcType="VARCHAR" />
+        <result column="domain_id" property="domainId" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <result column="current_tenant_id" property="currentTenantId" jdbcType="VARCHAR" />
+        <result column="unitprice_name" property="unitPriceName" jdbcType="VARCHAR" />
+        <result column="create_time" property="create_time" jdbcType="BIGINT" />
+    </resultMap>
+    
+    <resultMap id="BaseResultWithTenantMap" type="com.cloud.cloudapi.pojo.common.CloudUser">
+	    <result column="userid" property="userid" jdbcType="VARCHAR" />
+        <result column="account" property="account" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="os_user_id" property="osUserId" jdbcType="VARCHAR" />
+        <result column="mail" property="mail" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="company" property="company" jdbcType="VARCHAR" />
+        <result column="customer_manager" property="customerManager" jdbcType="VARCHAR" />
+        <result column="enabled" property="enabled" jdbcType="BOOLEAN" />
+        <result column="currentregion" property="currentregion" jdbcType="VARCHAR" />
+        <result column="locale" property="locale" jdbcType="VARCHAR" />
+        <result column="template" property="templateId" jdbcType="VARCHAR" />
+        <result column="version" property="version" jdbcType="VARCHAR" />
+        <result column="domain_id" property="domainId" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <result column="current_tenant_id" property="currentTenantId" jdbcType="VARCHAR" />
+        <result column="unitprice_name" property="unitPriceName" jdbcType="VARCHAR" />
+        <result column="create_time" property="create_time" jdbcType="BIGINT" />
+        
+        <result column="ostenantid" property="osTenantId" jdbcType="VARCHAR" />
+        <result column="ostenantname" property="osTenantName" jdbcType="VARCHAR" />
+        <result column="osdomainid" property="osDomainId" jdbcType="VARCHAR" />
+        <result column="customerManagerUserid" property="customer_manager_userid" jdbcType="VARCHAR" />
+        <result column="customerManagerName" property="customer_manager_name" jdbcType="VARCHAR" />
+        <result column="customerManagerTenantid" property="customer_manager_tenantid" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        userid,account,name,password,os_user_id,mail,phone,company,customer_manager,enabled,currentregion,locale,template,domain_id,version,tenant_id,current_tenant_id,unitprice_name,create_time
+	</sql>
+	
+    <sql id="all_fields_forlink">
+        clouduser.userid, clouduser.account, clouduser.name,clouduser.password,clouduser.os_user_id,clouduser.mail,clouduser.phone,clouduser.company,clouduser.customer_manager,clouduser.enabled,
+        clouduser.currentregion,clouduser.locale,clouduser.template,clouduser.domain_id,clouduser.version,clouduser.tenant_id,clouduser.current_tenant_id,clouduser.unitprice_name,clouduser.create_time
+	</sql>	
+	
+    <!-- 	<sql id="all_fields_with_tenant">
+        clouduser.userid, clouduser.account, clouduser.name,clouduser.password,clouduser.mail,clouduser.phone,clouduser.company,clouduser.customer_manager,clouduser.enabled,clouduser.create_time,
+        tenants.id as ostenantid ,tenants.name as ostenantname ,tenants.domain_id as osdomainid
+	</sql> -->
+	
+	<sql id="all_fields_with_tenant">
+	userid,account,name,password,os_user_id,mail,phone,company,customer_manager,enabled,currentregion,locale,template,domain_id,version,tenant_id,current_tenant_id,unitprice_name,create_time,
+	ostenantid,ostenantname,customer_manager_userid ,customer_manager_name,customer_manager_tenantid
+    </sql>
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from clouduser where userid=#{id}
+    </select>
+    
+    <select id="selectUsersByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from clouduser where tenant_id=#{tenantId}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.common.CloudUser">
+		insert into clouduser ( <include refid="all_fields" /> )
+		values (
+		#{userid}, #{account}, #{name}, #{password},#{osUserId},#{mail},#{phone},#{company},#{customerManager},#{enabled},#{currentregion},
+		#{locale},#{templateId},#{domainId},#{version},#{tenantId},#{currentTenantId},#{unitPriceName},#{create_time}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.common.CloudUser">
+        update clouduser set account = #{account}, name = #{name},password=#{password},
+        os_user_id=#{osUserId},mail=#{mail},phone=#{phone},company=#{company},customer_manager=#{customerManager},
+        enabled=#{enabled},currentregion=#{currentregion},locale=#{locale},template=#{templateId},domain_id=#{domainId},version=#{version},
+        tenant_id=#{tenantId},current_tenant_id=#{currentTenantId},unitprice_name=#{unitPriceName} where userid = #{userid}
+    </update>
+    
+    <update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into clouduser (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.userid}, #{item.account},#{item.name}, #{item.password},#{item.osUserId},#{item.mail},#{item.phone},#{item.company},#{item.customerManager},
+         #{item.enabled},#{item.currentregion},#{item.locale},#{item.templateId},#{item.domainId},#{item.version},#{item.tenantId},#{item.currentTenantId},#{item.unitPriceName},#{item.create_time})    
+       </foreach> ON DUPLICATE KEY UPDATE
+        account=VALUES(account),name=VALUES(name),password=VALUES(password),os_user_id=VALUES(os_user_id),
+        mail=VALUES(mail),phone=VALUES(phone),company=VALUES(company),customer_manager=VALUES(customer_manager),
+        enabled=VALUES(enabled),currentregion=VALUES(currentregion),locale=VALUES(locale),template=VALUES(template),domain_id=#{domain_id},
+        version=VALUES(version),tenant_id=VALUES(tenant_id),current_tenant_id=VALUES(current_tenant_id),unitprice_name=VALUES(unitprice_name)
+    </update>  
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from clouduser where userid =#{id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from clouduser
+	</select>
+	
+    <select id="countNumByUserAccount" resultType="java.lang.Integer" parameterType="java.lang.String">
+	  select count(*) as num from clouduser where account =#{account} and enabled = 1
+	</select>
+	
+    <select id="selectList" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from clouduser order by create_time desc
+    </select>
+    
+      <!-- <select id="selectListWithTenant" resultMap="BaseResultWithTenantMap">
+      select <include refid="all_fields_with_tenant" />
+	  from clouduser,tenants,user_tenant_domain 
+	  where clouduser.userid=user_tenant_domain.clouduserid and user_tenant_domain.ostenantid=tenants.id
+	  order by clouduser.create_time desc
+    </select> -->
+
+	<select id="selectListWithTenant" resultMap="BaseResultWithTenantMap">
+		SELECT
+		<include refid="all_fields_with_tenant" />
+		from ( select clouduser.userid, clouduser.account,
+		clouduser.name,clouduser.password,clouduser.os_user_id,clouduser.mail,clouduser.phone,clouduser.company,clouduser.customer_manager,clouduser.enabled,clouduser.currentregion,
+		clouduser.locale,clouduser.template,clouduser.domain_id,clouduser.version,clouduser.tenant_id,clouduser.current_tenant_id,clouduser.unitprice_name,clouduser.create_time,tenants.id
+		as ostenantid ,tenants.name as ostenantname ,tenants.domain_id as
+		osdomainid,tenants.parent_id from clouduser,tenants,user_tenant_domain
+		where clouduser.userid=user_tenant_domain.clouduserid and
+		user_tenant_domain.ostenantid=tenants.id ) as user_table
+		LEFT JOIN
+		( select clouduser.userid as customer_manager_userid , clouduser.name as customer_manager_name,user_tenant_domain.ostenantid as customer_manager_tenantid 
+		from clouduser, user_tenant_domain where
+		clouduser.userid=user_tenant_domain.clouduserid ) as customer_table
+		ON 
+		user_table.parent_id = customer_manager_tenantid
+		order by create_time desc
+	</select>
+    
+     <select id="selectWithTenantByPrimaryKey" resultMap="BaseResultWithTenantMap">
+        SELECT
+		<include refid="all_fields_with_tenant" />
+		from ( select clouduser.userid, clouduser.account,
+		clouduser.name,clouduser.password,clouduser.os_user_id,clouduser.mail,clouduser.phone,clouduser.company,clouduser.customer_manager,clouduser.enabled,clouduser.currentregion,clouduser.locale,
+		clouduser.template,clouduser.domain_id,clouduser.version,clouduser.tenant_id,clouduser.current_tenant_id,clouduser.unitprice_name,clouduser.create_time,tenants.id
+		as ostenantid ,tenants.name as ostenantname ,tenants.domain_id as
+		osdomainid,tenants.parent_id from clouduser,tenants,user_tenant_domain
+		where clouduser.userid=user_tenant_domain.clouduserid and
+		user_tenant_domain.ostenantid=tenants.id ) as user_table
+		LEFT JOIN
+		( select clouduser.userid as customer_manager_userid , clouduser.name as customer_manager_name ,user_tenant_domain.ostenantid as customer_manager_tenantid 
+		from clouduser, user_tenant_domain where
+		clouduser.userid=user_tenant_domain.clouduserid ) as customer_table
+		ON 
+		user_table.parent_id = customer_manager_tenantid
+	    WHERE userid =#{id}
+    </select>
+    
+    <select id="selectByUserInfo" resultMap="BaseResultMap" parameterType="com.cloud.cloudapi.pojo.common.CloudUser">
+      select <include refid="all_fields" />
+	  from clouduser where account =#{account} and password=#{password}
+    </select>
+    
+    <select id="selectByGuiTokenId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields_forlink" />
+	  from clouduser,tokengui,user_tenant_domain where tokengui.guitokenid=#{guitokenid} 
+	  and user_tenant_domain.id = tokengui.tenantuserid
+	  and clouduser.userid = user_tenant_domain.clouduserid
+    </select>
+    
+    <select id="selectByOsTokenId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields_forlink" />
+	  from clouduser,tokenos,user_tenant_domain where tokenos.ostokenid=#{ostokenid} 
+	  and user_tenant_domain.id = tokenos.tenantuserid
+	  and clouduser.userid = user_tenant_domain.clouduserid
+    </select>
+        
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from clouduser  limit #{0}, #{1}
+    </select>  
+    
+    <select id="selectByAccount" resultMap="BaseResultMap" parameterType="com.cloud.cloudapi.pojo.common.CloudUser">
+      select <include refid="all_fields" />
+	  from clouduser where account =#{account}
+    </select>
+    
+    <select id="selectUserByIds" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from clouduser
+	 where userid in
+       <foreach collection="list" item="id" open="(" close=")" separator=",">
+         #{id}
+       </foreach>
+    </select> 
+    
+</mapper>

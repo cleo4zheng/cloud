@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.PortMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.Port">
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="mac_address" property="macAddress" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="network_id" property="network_id" jdbcType="VARCHAR" />  
+        <result column="subnet_id" property="subnetId" jdbcType="VARCHAR" />
+        <result column="ip" property="ip" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <result column="security_group_id" property="securityGroupId" jdbcType="VARCHAR" />
+        <result column="device_id" property="device_id" jdbcType="VARCHAR" />       
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+
+    <sql id="all_fields">
+        id,name, mac_address,status,network_id,subnet_id,ip,tenant_id,security_group_id,device_id,million_seconds
+	</sql>
+	
+   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from ports where id=#{id}
+    </select>
+    
+    <select id="selectByNetworkId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from ports where network_id=#{network_id}
+    </select>
+    
+    
+    <select id="selectPortsBySubetId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from ports where subnet_id=#{subnetId}
+    </select>
+    
+    <select id="selectByIp" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from ports where ip like '%${_parameter}%'
+    </select>
+    
+    <select id="selectPortsById" resultMap="BaseResultMap">
+      select * from ports e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+    <select id="selectIpOfPortsById" resultType="String">
+      select ip from ports e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+    <select id="selectByIpAndNetworkId" resultMap="BaseResultMap" >
+     select <include refid="all_fields" /> from ports where ip = #{0} and network_id = #{1}
+    </select>
+    
+    <select id="selectListByNetworkId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from ports where network_id=#{network_id}
+    </select>
+    
+    <select id="selectPortsBySecurityGroupId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from ports where security_group_id like '%${_parameter}%'
+    </select>
+   
+   <select id="selectListByTenantIds" resultMap="BaseResultMap">
+    select <include refid="all_fields" />
+	 from ports
+	 where tenant_id in
+      <foreach collection="list" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+   </select> 
+   
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Port">
+		insert into ports ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name}, #{macAddress},#{status}, #{network_id}, #{subnetId},#{ip},#{tenantId},#{securityGroupId},#{device_id}, #{millionSeconds}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into ports (<include refid="all_fields" /> )   
+       values  
+       (#{id}, #{name}, #{macAddress},#{status}, #{network_id}, #{subnetId},#{ip},#{tenantId},#{securityGroupId},#{device_id}, #{millionSeconds})  
+        ON DUPLICATE KEY UPDATE
+        name = #{name},mac_address = #{macAddress},status = #{status}, network_id = #{network_id},subnet_id = #{subnetId},
+        ip = #{ip}, tenant_id = #{tenantId},security_group_id = #{securityGroupId},device_id = #{device_id},million_seconds = #{millionSeconds}
+	</insert>
+	
+   <update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into ports (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id},#{item.name},#{item.macAddress},#{item.status},#{item.network_id},#{item.subnetId},#{item.ip},#{item.tenantId},#{item.securityGroupId},#{item.device_id},#{item.millionSeconds})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       name = VALUES(name), mac_address = VALUES(mac_address), status=VALUES(status),network_id=VALUES(network_id),subnet_id=VALUES(subnet_id), 
+       ip=VALUES(ip), tenant_id=VALUES(tenant_id), security_group_id=VALUES(security_group_id),device_id=VALUES(device_id),million_seconds=VALUES(million_seconds)
+    </update> 
+     
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Port">
+        update ports set name = #{name},mac_address = #{macAddress},status = #{status}, network_id = #{network_id},subnet_id = #{subnetId},
+        ip = #{ip}, tenant_id = #{tenantId},security_group_id = #{securityGroupId},device_id = #{device_id},million_seconds = #{millionSeconds}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from ports where id =#{id}
+	</delete>
+	
+	<delete id= "deleteByIPAndDeviceId">
+       delete from ports where ip =#{0} and device_id=#{1}
+ 	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from ports
+	</select>
+	
+	<select id="selectAllByTenantIdWithLimit" resultMap="BaseResultMap" >
+      select <include refid="all_fields" />
+	  from ports where tenant_id = #{0} order by million_seconds DESC limit #{1}
+    </select>
+    
+    <select id="selectByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from ports where device_id = #{device_id}
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from ports 
+    </select>
+    
+     <select id="selectAllByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from ports where tenant_id = #{tenantId} order by million_seconds DESC
+    </select>
+    
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from ports  limit #{0}, #{1}
+    </select>    
+      
+</mapper>

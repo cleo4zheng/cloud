@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.PoolStackMapper" >
+  <resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.PoolStack" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="pool_id" property="poolId" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="create_at" property="createAt" jdbcType="VARCHAR" />
+    <result column="update_at" property="updateAt" jdbcType="VARCHAR" />
+    <result column="core" property="core" jdbcType="INTEGER" />
+    <result column="ram" property="ram" jdbcType="INTEGER" />
+    <result column="fip" property="fip" jdbcType="VARCHAR" />
+    <result column="volume" property="volume" jdbcType="VARCHAR" />
+    <result column="dbaas" property="dbaas" jdbcType="VARCHAR" />
+    <result column="maas" property="maas" jdbcType="VARCHAR" />
+    <result column="vpnaas" property="vpnaas" jdbcType="VARCHAR" />
+    <result column="lbaas" property="lbaas" jdbcType="VARCHAR" />
+    <result column="fwaas" property="fwaas" jdbcType="VARCHAR" />
+    <result column="az" property="az" jdbcType="VARCHAR" />
+    <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    <result column="display_name" property="displayName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, pool_id, status, create_at, update_at, core, ram, fip, volume, dbaas, maas, 
+    vpnaas, lbaas, fwaas, az, million_seconds, display_name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from poolstacks
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectByPoolId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from poolstacks
+    where pool_id = #{poolId,jdbcType=VARCHAR}
+    order by million_seconds desc
+  </select>
+  
+   <select id="selectByIds" resultMap="BaseResultMap">
+      select <include refid="Base_Column_List" /> from poolstacks e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from poolstacks
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="insert" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.PoolStack" >
+    insert into poolstacks (id, name, pool_id, 
+      status, create_at, update_at, 
+      core, ram, fip, volume, 
+      dbaas, maas, vpnaas, 
+      lbaas, fwaas, az, million_seconds, display_name)
+    values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{poolId,jdbcType=VARCHAR}, 
+      #{status,jdbcType=VARCHAR}, #{createAt,jdbcType=VARCHAR}, #{updateAt,jdbcType=VARCHAR}, 
+      #{core,jdbcType=INTEGER}, #{ram,jdbcType=INTEGER}, #{fip,jdbcType=VARCHAR}, #{volume,jdbcType=VARCHAR}, 
+      #{dbaas,jdbcType=VARCHAR}, #{maas,jdbcType=VARCHAR}, #{vpnaas,jdbcType=VARCHAR}, 
+      #{lbaas,jdbcType=VARCHAR}, #{fwaas,jdbcType=VARCHAR}, #{az,jdbcType=VARCHAR}, #{millionSeconds,jdbcType=BIGINT}, #{displayName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.PoolStack" >
+    insert into poolstacks
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="poolId != null" >
+        pool_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createAt != null" >
+        create_at,
+      </if>
+      <if test="updateAt != null" >
+        update_at,
+      </if>
+      <if test="core != null" >
+        core,
+      </if>
+      <if test="ram != null" >
+        ram,
+      </if>
+      <if test="fip != null" >
+        fip,
+      </if>
+      <if test="volume != null" >
+        volume,
+      </if>
+      <if test="dbaas != null" >
+        dbaas,
+      </if>
+      <if test="maas != null" >
+        maas,
+      </if>
+      <if test="vpnaas != null" >
+        vpnaas,
+      </if>
+      <if test="lbaas != null" >
+        lbaas,
+      </if>
+      <if test="fwaas != null" >
+        fwaas,
+      </if>
+      <if test="az != null" >
+        az,
+      </if>
+      <if test="millionSeconds != null" >
+        million_seconds,
+      </if>
+      <if test="displayName != null" >
+        display_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="poolId != null" >
+        #{poolId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createAt != null" >
+        #{createAt,jdbcType=VARCHAR},
+      </if>
+      <if test="updateAt != null" >
+        #{updateAt,jdbcType=VARCHAR},
+      </if>
+      <if test="core != null" >
+        #{core,jdbcType=INTEGER},
+      </if>
+      <if test="ram != null" >
+        #{ram,jdbcType=INTEGER},
+      </if>
+      <if test="fip != null" >
+        #{fip,jdbcType=VARCHAR},
+      </if>
+      <if test="volume != null" >
+        #{volume,jdbcType=VARCHAR},
+      </if>
+      <if test="dbaas != null" >
+        #{dbaas,jdbcType=VARCHAR},
+      </if>
+      <if test="maas != null" >
+        #{maas,jdbcType=VARCHAR},
+      </if>
+      <if test="vpnaas != null" >
+        #{vpnaas,jdbcType=VARCHAR},
+      </if>
+      <if test="lbaas != null" >
+        #{lbaas,jdbcType=VARCHAR},
+      </if>
+      <if test="fwaas != null" >
+        #{fwaas,jdbcType=VARCHAR},
+      </if>
+      <if test="az != null" >
+        #{az,jdbcType=VARCHAR},
+      </if>
+      <if test="millionSeconds != null" >
+        #{millionSeconds,jdbcType=BIGINT},
+      </if>
+      <if test="displayName != null" >
+        #{displayName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.PoolStack" >
+    update poolstacks
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="poolId != null" >
+        pool_id = #{poolId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createAt != null" >
+        create_at = #{createAt,jdbcType=VARCHAR},
+      </if>
+      <if test="updateAt != null" >
+        update_at = #{updateAt,jdbcType=VARCHAR},
+      </if>
+      <if test="core != null" >
+        core = #{core,jdbcType=INTEGER},
+      </if>
+      <if test="ram != null" >
+        ram = #{ram,jdbcType=INTEGER},
+      </if>
+      <if test="fip != null" >
+        fip = #{fip,jdbcType=VARCHAR},
+      </if>
+      <if test="volume != null" >
+        volume = #{volume,jdbcType=VARCHAR},
+      </if>
+      <if test="dbaas != null" >
+        dbaas = #{dbaas,jdbcType=VARCHAR},
+      </if>
+      <if test="maas != null" >
+        maas = #{maas,jdbcType=VARCHAR},
+      </if>
+      <if test="vpnaas != null" >
+        vpnaas = #{vpnaas,jdbcType=VARCHAR},
+      </if>
+      <if test="lbaas != null" >
+        lbaas = #{lbaas,jdbcType=VARCHAR},
+      </if>
+      <if test="fwaas != null" >
+        fwaas = #{fwaas,jdbcType=VARCHAR},
+      </if>
+      <if test="az != null" >
+        az = #{az,jdbcType=VARCHAR},
+      </if>
+      <if test="millionSeconds != null" >
+        million_seconds = #{millionSeconds,jdbcType=BIGINT},
+      </if>
+      <if test="displayName != null" >
+        display_name = #{displayName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.PoolStack" >
+    update poolstacks
+    set name = #{name,jdbcType=VARCHAR},
+      pool_id = #{poolId,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      create_at = #{createAt,jdbcType=VARCHAR},
+      update_at = #{updateAt,jdbcType=VARCHAR},
+      core = #{core,jdbcType=INTEGER},
+      ram = #{ram,jdbcType=INTEGER},
+      fip = #{fip,jdbcType=VARCHAR},
+      volume = #{volume,jdbcType=VARCHAR},
+      dbaas = #{dbaas,jdbcType=VARCHAR},
+      maas = #{maas,jdbcType=VARCHAR},
+      vpnaas = #{vpnaas,jdbcType=VARCHAR},
+      lbaas = #{lbaas,jdbcType=VARCHAR},
+      fwaas = #{fwaas,jdbcType=VARCHAR},
+      az = #{az,jdbcType=VARCHAR},
+      million_seconds = #{millionSeconds,jdbcType=BIGINT},
+      display_name = #{displayName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

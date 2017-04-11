@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.RegionMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.common.Region">
+        <id column="regionid" property="id" jdbcType="VARCHAR" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <result column="parentid" property="parent_region_id" jdbcType="VARCHAR" />
+    </resultMap>
+ 
+    <sql id="all_fields">
+        regionid,description,parentid
+	</sql>  
+	
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from region where regionid=#{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.common.Region">
+		insert into region ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{description}, #{parent_region_id}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.common.Region">
+        update region set description = #{description}, parentid = #{parent_region_id}
+        where regionid = #{id}
+    </update>
+     
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from region where regionid = #{id}
+	</delete>
+	
+<!-- selt dao -->	
+    <select id="countNum" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select count(*) as num from region where regionid = #{id}
+	</select>
+	
+    <select id="selectList" resultMap="BaseResultMap"> 
+     select <include refid="all_fields" /> from region order by regionid desc
+    </select>
+
+</mapper>

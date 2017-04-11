@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.NotificationListMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.NotificationList">
+	    <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenant_id" jdbcType="VARCHAR" />
+        <collection property="terminals" ofType="com.cloud.cloudapi.pojo.openstackapi.forgui.Terminal">
+        	<id column="terminal_id" property="id" jdbcType="VARCHAR" />
+	        <result column="type" property="type" jdbcType="VARCHAR" />
+	        <result column="content" property="content" jdbcType="VARCHAR" />
+	        <result column="verified" property="verified" jdbcType="BOOLEAN" />
+        </collection>
+    </resultMap>
+
+    
+    <sql id="all_fields">
+        notification_lists.id, NAME, description, created_at, tenant_id, terminals.id terminal_id, TYPE, content, verified, notification_list_id
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     	SELECT <include refid="all_fields" />
+		FROM notification_lists 
+		LEFT JOIN terminals ON notification_lists.id = terminals.notification_list_id
+		WHERE notification_lists.id = #{id}
+    </select>
+    
+    <select id="selectByIds" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from notification_lists e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.NotificationList">
+		INSERT INTO notification_lists
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null"> id, </if>
+			<if test="name != null"> name, </if>
+			<if test="description != null"> description, </if>
+			<if test="tenant_id != null"> tenant_id, </if>
+			created_at
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null"> #{id}, </if>
+			<if test="name != null"> #{name}, </if>
+			<if test="description != null"> #{description}, </if>
+			<if test="tenant_id != null"> #{tenant_id}, </if>
+			NOW()
+		</trim>
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.NotificationList">
+		UPDATE notification_lists 
+		<set>
+			<if test="name != null">name=#{name},</if>
+			<if test="description != null">description=#{description}</if>
+		</set>
+		WHERE id=#{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       DELETE FROM notification_lists WHERE id = #{id}
+	</delete>
+  
+   <!-- self dao -->
+	<select id="selectAllByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+		SELECT <include refid="all_fields" />
+		FROM notification_lists
+		LEFT JOIN terminals ON notification_lists.id = terminals.notification_list_id 
+		WHERE tenant_id = #{tenant_id}
+		ORDER BY created_at DESC 
+    </select>
+ 
+</mapper>

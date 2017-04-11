@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.NotificationMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.Notification">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="read" property="read" jdbcType="BOOLEAN" />
+        <result column="type" property="type" jdbcType="VARCHAR" />
+        <result column="text" property="text" jdbcType="VARCHAR" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenant_id" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        notifications.id, notifications.name, notifications.read, notifications.type, notifications.text, notifications.description, notifications.tenant_id, created_at
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     	SELECT <include refid="all_fields" />
+		FROM notifications
+		where id = #{id}
+    </select>
+    
+    <select id="selectByIds" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from notifications e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Notification">
+		INSERT INTO notifications
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			id
+			<if test="name != null"> ,name </if>
+			<if test="read != null"> ,notifications.read </if>
+			<if test="type != null"> ,notifications.type </if>
+			<if test="text != null"> ,notifications.text </if>
+			<if test="description != null"> ,description </if>
+			<if test="tenant_id != null"> ,tenant_id</if>
+			<if test="createdAt != null"> ,created_at </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{id}
+			<if test="name != null"> ,#{name} </if>
+			<if test="read != null"> ,#{read} </if>
+			<if test="type != null"> ,#{type} </if>
+			<if test="text != null"> ,#{text} </if>
+			<if test="description != null"> ,#{description} </if>
+			<if test="tenant_id != null"> ,#{tenant_id} </if>
+			<if test="createdAt != null"> ,#{createdAt} </if>
+		</trim>
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Notification">
+		UPDATE notifications 
+		<set>
+			<if test="name != null"> name = #{name} </if>
+			<if test="read != null"> read = #{read} </if>
+			<if test="type != null"> type = #{type} </if>
+			<if test="text != null"> text = #{text} </if>
+			<if test="description != null"> description = #{description} </if>
+			<if test="tenant_id != null"> tenant_id = #{tenant_id} </if>
+			<if test="createdAt != null"> created_at = #{createdAt} </if>
+		</set>
+		WHERE id=#{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       DELETE FROM notifications WHERE id = #{id}
+	</delete>
+  
+   <!-- self dao -->
+	<select id="selectAllPage" resultMap="BaseResultMap">
+		SELECT <include refid="all_fields" />
+		FROM notifications
+		WHERE
+		  tenant_id is not null 
+		<if test="null != tenant_id and '' != tenant_id">
+		   and tenant_id = #{tenant_id} 
+		</if>
+		
+		<if test="null != paramMap and null != paramMap.get('type') and '' != paramMap.get('type')" > 
+		  type = #{paramMap.get('type')}
+		</if>
+		
+		<if test="null != paramMap and null != paramMap.get('read') and '' != paramMap.get('read')"> 
+		  and read = #{paramMap.get('read')}
+		</if>
+		
+		<if test="null != paramMap and paramMap.get('limit') != null and '' != paramMap.get('limit')"> limit #{paramMap.get('limit')} </if>
+		ORDER BY created_at DESC 
+    </select>
+    
+    <update id= "updateRead">
+       UPDATE notifications SET notifications.read = #{read} 
+       WHERE id=#{id}
+	</update>
+	
+	<update id= "updateNotificationsRead">
+       UPDATE notifications SET notifications.read = #{read} 
+       WHERE id in 
+		<foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</update>
+ 
+    <select id="countNumByTenantId" resultType="java.lang.Integer" parameterType="java.lang.String">
+	  select count(*) as num from notifications where tenant_id =#{tenantId} and notifications.read = 0
+	</select>
+	
+	<select id="selectLastByCreatedAt"  resultMap="BaseResultMap" parameterType="java.lang.String">
+	  select * from notifications 
+	  <if test="null != tenant_id and '' != tenant_id">
+		  where tenant_id =#{tenant_id}
+	  </if>
+	  ORDER BY created_at desc limit 1	 
+	</select>
+</mapper>

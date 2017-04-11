@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.RatingTemplateMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.rating.RatingTemplate">
+	    <result column="id" property="template_id" jdbcType="VARCHAR" />
+	    <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <result column="version_ids" property="versionIds" jdbcType="VARCHAR" />
+        <result column="default_flag" property="defaultFlag" jdbcType="BOOLEAN" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id,name, description, version_ids,default_flag,million_seconds
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from rating_templates where name=#{name}
+    </select>
+    
+    <select id="selectDefaultTemplate" resultMap="BaseResultMap">
+     select <include refid="all_fields" /> from rating_templates where default_flag=true
+    </select>
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from rating_templates where id=#{template_id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.rating.RatingTemplate">
+		insert into rating_templates ( <include refid="all_fields" /> )
+		values (
+		#{template_id},#{name}, #{description}, #{versionIds},#{defaultFlag},#{millionSeconds}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into rating_templates (<include refid="all_fields" /> )   
+       values  
+       (#{template_id},#{name},#{description},#{versionIds},#{defaultFlag},#{millionSeconds})  
+       ON DUPLICATE KEY UPDATE
+       name = #{name},description = #{description}, version_ids = #{versionIds},default_flag=#{defaultFlag},million_seconds = #{millionSeconds}
+	</insert>
+	
+    <update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into rating_templates (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.template_id},#{item.name}, #{item.description},#{item.versionIds}, #{item.defaultFlag},#{item.millionSeconds})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       name = VALUES(name),description = VALUES(description),version_ids = VALUES(version_ids), default_flag = VALUES(default_flag), million_seconds = VALUES(million_seconds)
+    </update>
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.rating.RatingTemplate">
+        update rating_templates set name = #{name},description = #{description}, version_ids = #{versionIds},default_flag=#{defaultFlag},million_seconds = #{millionSeconds}
+        where id = #{template_id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from rating_templates where id =#{template_id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from rating_templates
+	</select>
+	
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from rating_templates order by million_seconds DESC
+    </select>
+    
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.BillingReportMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.rating.BillingReport">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+	    <result column="name" property="name" jdbcType="VARCHAR" />
+	    <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+	    <result column="total" property="cost" jdbcType="FLOAT" />
+        <result column="compute" property="compute" jdbcType="FLOAT" />
+        <result column="compute_details" property="computeDetails" jdbcType="VARCHAR" />
+        <result column="storage" property="storage" jdbcType="FLOAT" />
+        <result column="storage_details" property="storageDetails" jdbcType="VARCHAR" />
+        <result column="network" property="network" jdbcType="FLOAT" />
+        <result column="network_details" property="networkDetails" jdbcType="VARCHAR" />
+        <result column="service" property="service" jdbcType="FLOAT" />
+        <result column="service_details" property="serviceDetails" jdbcType="VARCHAR" />
+        <result column="image" property="image" jdbcType="FLOAT" />
+        <result column="image_details" property="imageDetails" jdbcType="VARCHAR" />
+        <result column="complete" property="complete" jdbcType="BOOLEAN" />
+        <result column="billing_id" property="billingId" jdbcType="VARCHAR" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id,name,tenant_id,total, compute, compute_details,storage,storage_details,network,network_details,service,service_details,image,image_details,complete,billing_id,million_seconds
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from billing_reports where id=#{id}
+    </select>
+    
+    <select id="selectByTenantIdAndName" resultMap="BaseResultMap">
+     select <include refid="all_fields" /> from billing_reports where name=#{0} and tenant_id=#{1} 
+    </select>
+    
+    <select id="selectByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from billing_reports where tenant_id=#{tenantId} 
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.rating.BillingReport">
+		insert into billing_reports ( <include refid="all_fields" /> )
+		values (
+		#{name},#{tenantId},#{cost}, #{compute},#{computeDetails}, #{storage}, #{storageDetails},#{network},#{networkDetails},
+		#{service},#{serviceDetails},#{image},#{imageDetails},#{complete},#{billingId},#{millionSeconds}
+		)
+	</insert>
+	
+   <insert id="insertOrUpdate">
+       insert into billing_reports (<include refid="all_fields" /> )   
+       values  
+       (#{name}, #{tenantId},#{cost}, #{compute},#{computeDetails},#{storage},#{storageDetails}, #{network},#{networkDetails},#{service},#{serviceDetails},#{image},#{imageDetails},#{complete},#{billingId},#{millionSeconds})  
+        ON DUPLICATE KEY UPDATE
+        name = #{name},tenant_id = #{tenantId},total = #{cost},compute = #{compute},compute_details = #{computeDetails},storage = #{storage}, storage_details = #{storageDetails},
+        network = #{network},network_details = #{networkDetails},service = #{service},service_details = #{serviceDetails},image = #{image}, image_details = #{imageDetails},
+        complete = #{complete},billing_id=#{billingId},million_seconds = #{millionSeconds}
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.rating.BillingReport">
+        update billing_reports set name=#{name},tenant_id=#{tenantId},total = #{cost},compute = #{compute}, compute_details = #{computeDetails},storage = #{storage},storage_details = #{storageDetails},
+        network = #{network},network_details = #{networkDetails},service = #{service},service_details = #{serviceDetails},image = #{image}, image_details = #{imageDetails}, complete = #{complete},
+        billing_id = #{billingId},million_seconds = #{millionSeconds}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from billing_reports where id =#{id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from billing_reports
+	</select>
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from billing_reports 
+    </select>
+    
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from billing_reports  limit #{0}, #{1}
+    </select>    
+
+</mapper>

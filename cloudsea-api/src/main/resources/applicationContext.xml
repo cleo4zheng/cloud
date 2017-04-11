@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xsi:schemaLocation="
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/jdbc
+    http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+    http://www.springframework.org/schema/cache
+    http://www.springframework.org/schema/cache/spring-cache.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd
+    http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- 自动扫描quick4j包 ,将带有注解的类 纳入spring容器管理 -->
+    <context:component-scan base-package="com.cloud.cloudapi"></context:component-scan>
+    
+    <!-- 引入配置文件 -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath:application.properties</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="configProperties" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">  
+        <property name="properties" ref="propertyConfigurer" />  
+    </bean>  
+    
+    <!-- openstack settting -->
+	<bean id="cloudconfig" class="com.cloud.cloudapi.pojo.common.CloudConfig" autowire="byName">
+		<property name="os_authurl" value="${os.auth.url}" />
+		<property name="os_authuser" value="${os.auth.user}" />
+		<property name="os_authpwd" value="${os.auth.pwd}" />
+		<property name="os_authdomainid" value="${os.auth.domainid}" />
+		<property name="os_authtenantid" value="${os.auth.tenantid}" />
+		<property name="os_defaultregion" value="${os.default.region}" />
+		<property name="os_utc_timezone" value="${os.utc.timezone}" />
+		<property name="timeout_token_os" value="${os.token.timeout}" />
+		<property name="time_createtoken_beforehand" value="${os.create.beforetimeout.time}" />
+		<property name="timeout_token_cloudapi" value="${cloudapi.token.timeout}" />
+		<property name="endpoint_refresh" value="${cloudapi.endpoint.refresh}" />
+		<property name="zabbix_enabled" value="${zabbix.enabled}" />
+		<property name="permission_enabled" value="${permission.enabled}" />
+		<property name="workflow_enabled" value="${wf.enabled}" />
+		<property name="workflow_url" value="${wf.url}" />
+		<property name="workflow_deployid" value="${wf.deploymentId}" />
+		<property name="systemVolumeSize" value="${system.volume.size}" />
+		<property name="systemWindowsVolumeSize" value="${system.windows.volume.size}" />
+		<property name="systemLinuxVolumeSize" value="${system.linux.volume.size}" />
+		<property name="systemCpuSpec" value="${system.core.spec}" />
+		<property name="systemRamSpec" value="${system.ram.spec}" />
+        <property name="systemVdiSpec" value="${system.vdi.spec}" />
+        <property name="systemBaremetalSpec" value="${system.baremetal.spec}" />
+        <property name="systemDBSpec" value="${system.db.spec}" />
+        <property name="systemContainerSpec" value="${system.container.spec}" />
+		<property name="systemInstanceSpec" value="${system.instance.spec}" />
+		<property name="systemInstanceType" value="${system.instance.type}" />
+		<property name="systemVolumeSpec" value="${system.volume.spec}" />
+		<property name="systemFloatingSpec" value="${system.floating.spec}" />
+		<property name="systemFloatingNum" value="${system.floating.num}" />
+		<property name="systemServiceSpec" value="${system.service.spec}" />
+		<property name="systemCpuRatio" value="${system.cpu.allocation.ratio}" />
+		<property name="systemRamRatio" value="${system.ram.allocation.ratio}" />
+		<property name="volumePrice" value="${price.volume}" />
+		<property name="corePrice" value="${price.core}" />
+		<property name="ramPrice" value="${price.ram}" />
+		<property name="baremetalCorePrice" value="${price.baremetal.core}" />
+		<property name="baremetalRamPrice" value="${price.baremetal.ram}" />
+		<property name="floatingPrice" value="${price.floating}" />
+		<property name="imagePrice" value="${price.image}" />
+		<property name="servicePrice" value="${price.service}" />
+		<property name="volumeRange" value="${volume.range}" />
+		<property name="floatingRange" value="${floating.range}" />
+		<property name="ipRange" value="${ip.range}" />
+		<property name="systemMaxTries" value="${system.maxTries}" />
+		<property name="systemWaitTime" value="${system.waitTime}" />	
+		<property name="poolVolumeRange" value="${pool.volume.range}" />	
+		<property name="poolFipRange" value="${pool.fip.range}" />	
+		<property name="poolCpuRange" value="${pool.cpu.range}" />	
+		<property name="poolRamfipRange" value="${pool.ram.range}" />	
+		<property name="instanceQuota" value="${quota.instance}" />
+		<property name="coreQuota" value="${quota.core}" />
+		<property name="ramQuota" value="${quota.ram}" />
+		<property name="keypairQuota" value="${quota.keypair}" />
+		<property name="floatingipQuota" value="${quota.floatingip}" />	
+		<property name="volumeQuota" value="${quota.volume}" />
+		<property name="systemVolumeQuota" value="${system.volume.quota}" />
+		<property name="systemFloatingIPQuota" value="${system.floatingip.quota}" />
+		<property name="externalNetworkName" value="${system.external.network.name}" />
+		<property name="systemIngoreHosts" value="${system.ingore.hosts}" />
+		<property name="vdiCorePrice" value="${price.vdi.core}" />
+		<property name="vdiRamPrice" value="${price.vdi.ram}" />
+		<property name="vdiCoreQuota" value="${quota.vdi.core}" />
+		<property name="vdiRamQuota" value="${quota.vdi.ram}" />
+		<property name="systemCcy" value="${price.ccy}" />
+		<property name="systemCcyName" value="${price.ccy.name}" />
+		<property name="systemCcyUnit" value="${price.ccy.unit}" />
+		<property name="systemCcyUnitName" value="${price.ccy.unit.name}" />
+		<property name="poolVdiCpuRange" value="${pool.vdi.cpu.range}" />
+		<property name="poolVdiRamRange" value="${pool.vdi.ram.range}" />
+		<property name="poolGeneralCpuRange" value="${pool.general.cpu.range}" />
+		<property name="poolGeneralRamRange" value="${pool.general.ram.range}" />
+		<property name="ratingReportTime" value="${rating.report.time}" />
+		<property name="ratingReportBeginDay" value="${rating.begine.day}" />
+		<property name="ratingReportEndDay" value="${rating.end.day}" />
+		<property name="systemVmwareNetworkId" value="${system.vmware.network.id}" />
+		<property name="systemVmwareZone" value="${system.vmware.zone}" />
+		<property name="depolyKernel" value="${ironic.depoly.kernel}" />
+		<property name="depolyRamdisk" value="${ironic.depoly.ramdisk}" />
+		<property name="systemIronicNetworkId" value="${system.ironic.network.id}" />
+		<property name="mailSmtpHost" value="${mail.smtp.host}" />
+		<property name="mailSmtpStatrttlsEnable" value="${mail.smtp.starttls.enable}" />
+        <property name="mailSmtpPort" value="${mail.smtp.port}" />
+        <property name="mailSmtpAuth" value="${mail.smtp.auth}" />
+        <property name="mailSenderAddress" value="${mail.sender.address}" />
+        <property name="mailSenderUsername" value="${mail.sender.username}" />
+        <property name="mailSenderPassword" value="${mail.sender.password}" />
+        <property name="systemDefaultPriceName" value="${rating.default.name}" />
+        <property name="systemDefaultCurrencyName" value="${rating.default.currency}" />
+        <property name="systemAdminDefaultPassword" value="${admin.pass}" /> 
+        <property name="systemAdminDefaultAccount" value="${admin.account}" /> 
+        <property name="systemAdminDefaultName" value="${admin.name}" /> 
+        <property name="systemAdminDefaultMail" value="${admin.mail}" /> 
+        <property name="systemAdminDefaultPhone" value="${admin.phone}" /> 
+        <property name="systemAdminDefaultCompany" value="${admin.company}" /> 
+        <property name="systemDefaultLocale" value="${os.default.locale}" /> 
+        <property name="cloudVMWareUrl" value="${cloudVMWare.url}" />
+	</bean>
+	
+	<!-- http连接池设置 -->
+	<bean id="commonPoolingHttpManager" class="com.cloud.cloudapi.util.http.pool.CommonPoolingHttpManager" 
+	init-method="initPool" destroy-method="destoryPool" autowire="byName">
+	    <property name="maxTotal" value="${hp.maxTotal}"/>
+	    <property name="maxPerRoute" value="${hp.maxPerRoute}"/>
+	</bean>
+	
+    
+    <!-- dataSource 配置 -->
+   <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="maxTotal" value="${ds.maxActive}" />
+		<property name="maxIdle" value="${ds.minIdle}" />
+		<property name="initialSize" value="${ds.initialSize}" />
+	    <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="${ds.timeBetweenEvictionRunsMillis}"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="${ds.minEvictableIdleTimeMillis}"/>
+	</bean>
+	
+    <!-- mybatis文件配置，扫描所有mapper文件 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" p:dataSource-ref="dataSource"
+          p:configLocation="classpath:mybatis-config.xml"
+          p:mapperLocations="classpath:com/cloud/cloudapi/dao/*.xml"/>
+
+    <!-- spring与mybatis整合配置，扫描所有dao -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer" p:basePackage="com/cloud/cloudapi/dao"
+          p:sqlSessionFactoryBeanName="sqlSessionFactory"/>
+
+    <!-- 对dataSource 数据源进行事务管理 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          p:dataSource-ref="dataSource"/>
+
+    <!-- 事务管理 通知 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!-- 对insert,update,delete 开头的方法进行事务管理,只要有异常就回滚 -->
+            <tx:method name="insert*" propagation="REQUIRED" rollback-for="java.lang.Throwable"/>
+            <tx:method name="update*" propagation="REQUIRED" rollback-for="java.lang.Throwable"/>
+            <tx:method name="delete*" propagation="REQUIRED" rollback-for="java.lang.Throwable"/>
+            <!-- select,count开头的方法,开启只读,提高数据库访问性能 -->
+            <tx:method name="select*" read-only="true"/>
+            <tx:method name="count*" read-only="true"/>
+            <!-- 对其他方法 使用默认的事务管理 -->
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+    
+    <aop:config>
+        <aop:pointcut id="serviceMethods" expression="execution(* com.cloud.cloudapi.service..*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethods"/>
+    </aop:config>
+
+     <!-- 系统初始化方法 -->
+     <bean id="systemInitialize" class="com.cloud.cloudapi.util.SystemInitializeBean" init-method="initialize">
+        <!--  <property name="admin_name" value="${system.admin_name}" />
+		 <property name="admin_account" value="${system.admin_account}" />
+		 <property name="admin_mail" value="${system.admin_mail}" />
+		 <property name="admin_phone" value="${system.admin_phone}" />
+		 <property name="admin_company" value="${system.admin_company}" />-->
+     </bean>  
+  
+     <!-- 线程池执行器参数配置 -->
+	 <bean id="threadpoolParameter" class = "com.cloud.cloudapi.sync.ThreadPoolParameter">
+	    <property name="corePoolSize" value ="10"/>
+	    <property name="maxPoolSize" value ="50"/>
+	    <property name="keepAlive" value ="3000"/>
+	    <property name="queeDeep" value ="12"/>
+	</bean>
+     
+    <!-- 配置使Spring采用CGLIB代理 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    
+</beans>

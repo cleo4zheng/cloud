@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.QuotaFieldMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.quota.QuotaField">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+	    <result column="field_id" property="field_id" jdbcType="VARCHAR" />
+        <result column="service_id" property="service_id" jdbcType="VARCHAR" />
+        <result column="template_id" property="template_id" jdbcType="VARCHAR" />
+        <result column="used" property="used" jdbcType="INTEGER" />
+        <result column="max" property="max" jdbcType="INTEGER" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id,field_id, service_id,template_id,used,max
+	</sql>
+	
+	<!-- basic super dao -->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from quota_fields where id=#{id}
+    </select>
+    
+    <select id="selectByServiceIdAndTemplateId" resultMap="BaseResultMap" >
+     select <include refid="all_fields" /> from quota_fields where service_id=#{0} and template_id=#{1}
+    </select>
+    
+    <select id="selectByTemplateId" resultMap="BaseResultMap" >
+     select <include refid="all_fields" /> from quota_fields where template_id=#{1}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.quota.QuotaField">
+		insert into quota_fields ( <include refid="all_fields" /> )
+		values (
+		#{id},#{field_id}, #{service_id},#{template_id},#{used},#{max}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into quota_fields (<include refid="all_fields" /> )   
+       values  
+       (#{id},#{field_id}, #{service_id},#{template_id},#{used},#{max})  
+       ON DUPLICATE KEY UPDATE
+       field_id = #{field_id},service_id = #{service_id}, template_id = #{template_id}, used = #{used}, max = #{max}
+	</insert>
+	
+	<update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into quota_fields (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id},#{item.field_id},#{item.service_id},#{item.template_id},#{item.used},#{item.max})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       field_id = VALUES(field_id), service_id = VALUES(service_id), template_id=VALUES(template_id),used=VALUES(used),max=VALUES(max)
+    </update> 
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.quota.QuotaField">
+        update quota_fields set field_id = #{field_id},service_id = #{service_id}, template_id = #{template_id}, used = #{used}, max = #{max}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from quota_fields where id =#{id}
+	</delete>
+	
+	<delete id= "deleteByTemplateId" parameterType="java.lang.String">
+       delete from quota_fields where template_id =#{template_id}
+	</delete>
+
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from quota_fields
+	</select>
+	
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from quota_fields order by million_seconds DESC
+    </select>
+    
+</mapper>

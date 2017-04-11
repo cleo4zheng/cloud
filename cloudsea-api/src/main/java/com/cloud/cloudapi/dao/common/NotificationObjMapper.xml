@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.NotificationObjMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.NotificationObj">
+	<result column="id" property="id" jdbcType="VARCHAR" />
+	    <result column="to" property="to" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="all_fields">
+       id, notification_objs.to, status, notification_objs.created_at
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     	SELECT <include refid="all_fields" />
+		FROM notification_objs
+		where id = #{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.NotificationObj">
+		INSERT INTO notification_objs
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		    id,
+			created_at
+			<if test="to != null and to != ''">,notification_objs.to</if>
+			<if test="status != null and status != ''">,status</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{id},
+			NOW()
+			<if test="to != null and to != ''">,#{to}</if>
+			<if test="status != null and status != ''">,#{status}</if>
+		</trim>
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.NotificationObj">
+		UPDATE notification_objs 
+		<set>
+			status = #{status}
+		</set>
+		WHERE id=#{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       DELETE FROM notification_objs WHERE id = #{id}
+	</delete>
+  
+   <!-- self dao -->
+   
+   <select id="selectByMonitorId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     	SELECT <include refid="all_fields" />
+		FROM notification_objs
+		left join monitors_notification_objs on notification_objs.id = monitors_notification_objs.notification_obj_id
+		where monitors_notification_objs.monitor_id = #{monitor_id}
+    </select>
+    
+    <select id="selectByTo" resultMap="BaseResultMap" parameterType="java.lang.String">
+     	SELECT <include refid="all_fields" />
+		FROM notification_objs
+		where notification_objs.to = #{to}
+    </select>
+	
+	<insert id="insertNotificationObjRelations">
+		INSERT INTO monitors_notification_objs
+		   (monitor_id, notification_obj_id) 
+		values
+		   (#{monitor_id}, #{notification_obj_id})
+		
+	</insert>
+	 
+    <delete id= "deleteNotificationObj">
+       DELETE FROM notification_objs WHERE id = #{notification_obj_id}
+	</delete>
+	
+	<delete id= "deleteNotificationObjRelations">    
+       DELETE FROM monitors_notification_objs  WHERE notification_obj_id = #{notification_obj_id} and monitor_id = #{monitor_id}
+	</delete>
+	
+	<delete id= "deleteNotificationObjByTo">
+       DELETE FROM notification_objs WHERE notification_objs.to = #{notification_list_id}
+	</delete>
+	
+	<delete id= "deleteNotificationObjRelationsByNOId">    
+       DELETE FROM monitors_notification_objs  WHERE notification_obj_id = #{notification_obj_id}
+	</delete>
+	
+	<delete id= "deleteMonitorNotificationObjsByMonitorId" parameterType="java.lang.String">    
+       DELETE FROM monitors_notification_objs  WHERE monitor_id = #{monitor_id}
+	</delete>
+
+</mapper>

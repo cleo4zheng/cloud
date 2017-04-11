@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.VolumeMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.Volume">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="instance_id" property="instanceId" jdbcType="VARCHAR" />
+        <result column="volume_id" property="volumeId" jdbcType="VARCHAR" />
+        <result column="backup_id" property="backupId" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <result column="size" property="size" jdbcType="INTEGER" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+        <result column="volume_type" property="volume_type" jdbcType="VARCHAR" />
+        <result column="bootable" property="bootable" jdbcType="BOOLEAN" />
+        <result column="device" property="device" jdbcType="VARCHAR" />
+        <result column="multiattach" property="multiattach" jdbcType="BOOLEAN"/>
+    </resultMap>
+    
+    <sql id="all_fields">
+        id, name, status,instance_id,volume_id,backup_id,tenant_id,size,million_seconds,volume_type,bootable,device,multiattach
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from volumes where id=#{id}
+    </select>
+    
+    <select id="selectByInstanceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from volumes where instance_id=#{instanceId}
+    </select>
+    
+    <select id="selectSystemVolumeByInstanceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from volumes where instance_id=#{instanceId} and bootable=true
+    </select>
+    
+    <select id="selectListByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from volumes where tenant_id=#{tenantId}
+    </select>
+    
+    <select id="selectDataVolumesByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from volumes where tenant_id=#{tenantId} and bootable != true order by million_seconds DESC
+    </select>
+    
+    <select id="selectListByTenantIdWithLimit" resultMap="BaseResultMap" >
+     select <include refid="all_fields" /> from volumes where tenant_id=#{0} order by million_seconds DESC limit #{1}
+    </select>
+    
+    <select id="selectDataVolumesByTenantIdWithLimit" resultMap="BaseResultMap" >
+     select <include refid="all_fields" /> from volumes where tenant_id=#{0} and bootable != true order by million_seconds DESC limit #{1}
+    </select>
+    
+    <select id="selectListByTenantIdAndStatus" resultMap="BaseResultMap" >
+     select <include refid="all_fields" /> from volumes where tenant_id=#{0} and status=#{1} 
+    </select>
+    
+    <select id="selectDataVolumesByTenantIdAndStatus" resultMap="BaseResultMap" >
+     select <include refid="all_fields" /> from volumes where tenant_id=#{0} and status=#{1} and bootable != true order by million_seconds DESC
+    </select>
+    
+    <select id="selectListByInstanceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from volumes where instance_id=#{instanceId}
+    </select>
+    
+   <select id="selectVolumesById" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from volumes e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+   <select id="selectListByTenantIds" resultMap="BaseResultMap">
+    select <include refid="all_fields" />
+	 from volumes
+	 where tenant_id in
+      <foreach collection="list" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+   </select> 
+   
+    <select id="getVolumesByIds" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from volumes
+	 where id in
+       <foreach collection="list" item="id" open="(" close=")" separator=",">
+         #{id}
+       </foreach>
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Volume">
+		insert into volumes ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name}, #{status}, #{instanceId},#{volumeId},#{backupId},#{tenantId},#{size}, #{millionSeconds},
+		#{volume_type},#{bootable},#{device},#{multiattach}
+		)
+	</insert>
+
+    <insert id="insertOrUpdate">
+       insert into volumes (<include refid="all_fields" /> )   
+       values  
+       (#{id},#{name},#{status},#{instanceId},#{volumeId},#{backupId},#{tenantId},#{size},#{millionSeconds},
+        #{volume_type},#{bootable},#{device},#{multiattach})  
+        ON DUPLICATE KEY UPDATE
+        name=#{name},status=#{status},instance_id=#{instanceId},volume_id=#{volumeId},backup_id=#{backupId},tenant_id=#{tenantId},
+        size=#{size},million_seconds=#{millionSeconds},volume_type=#{volume_type},bootable=#{bootable},device=#{device},multiattach=#{multiattach}
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Volume">
+        update volumes set name=#{name},status=#{status},instance_id=#{instanceId},volume_id=#{volumeId},backup_id=#{backupId},tenant_id=#{tenantId},
+        size=#{size},million_seconds=#{millionSeconds},volume_type=#{volume_type},bootable=#{bootable},device=#{device},multiattach=#{multiattach}
+        where id = #{id}
+    </update>
+
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from volumes where id =#{id}
+	</delete>
+	
+	<delete id="deleteVolumesByIds">
+     delete from volumes
+	 where id in
+       <foreach collection="list" item="id" open="(" close=")" separator=",">
+         #{id}
+       </foreach>
+    </delete>
+    
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from volumes
+	</select>
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from volumes 
+    </select>
+    
+    <select id="countNumByInstanceStatus" resultType="java.lang.Integer" parameterType="java.lang.String">
+	  select count(*) as num from volumes where status =#{status}
+	</select>
+     
+    <select id="countNumByVolumeType" resultType="java.lang.Integer" parameterType="java.lang.String">
+	  select count(*) as num from volumes where volume_type=#{volume_type}
+	</select>
+	
+    <select id="selectAllForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from volumes  limit #{0}, #{1}
+    </select>    
+
+</mapper>

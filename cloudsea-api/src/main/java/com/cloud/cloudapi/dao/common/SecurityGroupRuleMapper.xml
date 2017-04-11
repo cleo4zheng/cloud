@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.SecurityGroupRuleMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.SecurityGroupRule">
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="protocol" property="protocol" jdbcType="VARCHAR" />
+        <result column="port_range_min" property="port_range_min" jdbcType="INTEGER" />
+        <result column="port_range_max" property="port_range_max" jdbcType="INTEGER" />
+        <result column="cidr" property="cidr" jdbcType="VARCHAR" />
+        <result column="direction" property="direction" jdbcType="VARCHAR" /> 
+        <result column="security_group_id" property="security_group_id" jdbcType="VARCHAR" />   
+        <result column="created_at" property="createdAt" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="all_fields">
+        id,name, protocol,port_range_min,port_range_max,cidr,direction,security_group_id,created_at
+	</sql>
+	
+   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from securitygrouprules where id=#{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.SecurityGroupRule">
+		insert into securitygrouprules ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name}, #{protocol},#{port_range_min},#{port_range_max},#{cidr},#{direction},#{security_group_id},#{createdAt}
+		)
+	</insert>
+	
+   <insert id="insertOrUpdate">
+       insert into securitygrouprules (<include refid="all_fields" /> )   
+       values  
+       (#{id}, #{name}, #{protocol},#{port_range_min},#{port_range_max},#{cidr},#{direction},#{security_group_id},#{createdAt})  
+        ON DUPLICATE KEY UPDATE
+        name = #{name},protocol = #{protocol},port_range_min = #{port_range_min},port_range_max = #{port_range_max},cidr = #{cidr},
+        direction = #{direction},security_group_id = #{security_group_id},created_at = #{createdAt}
+	</insert>
+	
+	<!-- 
+	<insert id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into securitygrouprules (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id}, #{item.name}, #{item.protocol},#{item.port_range_min},#{item.port_range_max},#{item.cidr},#{item.direction},#{item.security_group_id},#{item.createdAt})    
+       </foreach> ON DUPLICATE KEY UPDATE
+        name = #{item.name},protocol = #{item.protocol},port_range_min = #{item.port_range_min},port_range_max = #{item.port_range_max},cidr = #{item.cidr},
+        direction = #{item.direction},security_group_id = #{item.security_group_id},created_at = #{item.createdAt}
+    </insert> 
+     -->
+     
+    <update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into securitygrouprules (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id}, #{item.name}, #{item.protocol},#{item.port_range_min},#{item.port_range_max},#{item.cidr},#{item.direction},#{item.security_group_id},#{item.createdAt})    
+       </foreach> ON DUPLICATE KEY UPDATE
+        name = VALUES(name),protocol = VALUES(protocol),port_range_min = VALUES(port_range_min),port_range_max = VALUES(port_range_max),cidr = VALUES(cidr),
+        direction = VALUES(direction),security_group_id = VALUES(security_group_id),created_at = VALUES(created_at)
+    </update> 
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.SecurityGroupRule">
+        update securitygrouprules set name = #{name},protocol = #{protocol},port_range_min = #{port_range_min},port_range_max = #{port_range_max},
+        cidr = #{cidr},direction = #{direction},security_group_id = #{security_group_id},created_at = #{createdAt}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from securitygrouprules where id =#{id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from securitygrouprules
+	</select>
+	
+	<select id="selectListBySecurityGroupId" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from securitygrouprules where  security_group_id =#{securityGroupId}
+    </select>
+
+    <select id="selectListBySecurityGroupRuleIds" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from securitygrouprules
+	 where id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+    <select id="selectAllList" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from securitygrouprules 
+    </select>
+    
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from securitygrouprules  limit #{0}, #{1}
+    </select>    
+           
+
+</mapper>

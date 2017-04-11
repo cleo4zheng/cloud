@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.DBUserMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.DBUser">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="instanceId" property="instanceId" jdbcType="VARCHAR" />
+        <result column="host" property="host" jdbcType="VARCHAR" />
+        <result column="granteddatabases" property="granteddatabases" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id, name, password, instanceId, host, granteddatabases
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from dbusers where id=#{id}
+    </select>
+    
+    <select id="selectByIds" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from dbusers e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.DBUser">
+		insert into dbusers ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name}, #{password},#{instanceId}, #{host} , #{granteddatabases}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.DBUser">
+        update dbusers set name = #{name}, instanceId = #{instanceId},host = #{host}, granteddatabases = #{granteddatabases}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from dbusers where id =#{id}
+	</delete>
+	
+	<delete id= "deleteByInstanceId" parameterType="java.lang.String">
+       delete from dbusers where instanceId =#{instanceId}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from dbusers
+	</select>
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from dbusers 
+    </select>
+    
+    
+    <select id="selectListWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from dbusers limit #{limit}
+    </select>
+     
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from dbusers  limit #{0}, #{1}
+    </select>    
+    
+    <select id="selectByinstanceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from dbusers where instanceId =#{instanceId}
+    </select>    
+    
+    <insert id="insertOrUpdate">
+       insert into dbusers (<include refid="all_fields" /> )   
+       values  
+       (#{id}, #{name}, #{password},#{instanceId}, #{host} , #{granteddatabases})  
+        ON DUPLICATE KEY UPDATE
+       name =#{name}, password =#{password},instanceId =#{instanceId}, host =#{host} , granteddatabases =#{granteddatabases}
+	</insert>
+
+</mapper>

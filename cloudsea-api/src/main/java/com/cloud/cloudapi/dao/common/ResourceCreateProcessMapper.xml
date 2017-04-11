@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.ResourceCreateProcessMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.ResourceCreateProcess">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+	    <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+	    <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="VARCHAR" />
+        <result column="task_state" property="taskState" jdbcType="VARCHAR" />
+        <result column="resource_state" property="resourceState" jdbcType="VARCHAR" />
+        <result column="begine_seconds" property="begineSeconds" jdbcType="BIGINT" />
+        <result column="complete_seconds" property="completeSeconds" jdbcType="BIGINT" />
+        <result column="message" property="message" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id,tenant_id,name,type,task_state,resource_state,begine_seconds,complete_seconds,message
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from resource_create_processes where id=#{id}
+    </select>
+    
+    <select id="selectAllByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from resource_create_processes where tenant_id = #{tenantId}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.ResourceCreateProcess">
+		insert into resource_create_processes ( <include refid="all_fields" /> )
+		values (
+		#{id},#{tenantId},#{name},#{type},#{taskState},#{resourceState},#{begineSeconds},#{completeSeconds},#{message}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into resource_create_processes (<include refid="all_fields" /> )   
+       values  
+       (#{id},#{tenantId},#{name},#{type},#{taskState},#{resourceState},#{begineSeconds},#{completeSeconds},#{message})  
+        ON DUPLICATE KEY UPDATE
+        name=#{name},tenant_id=#{tenantId},type=#{type},task_state=#{taskState},resource_state=#{resourceState},begine_seconds=#{begineSeconds},complete_seconds=#{completeSeconds},message=#{message}
+	</insert>
+
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.ResourceCreateProcess">
+        update resource_create_processes set tenant_id=#{tenantId},name=#{name},type=#{type},task_state=#{taskState},resource_state=#{resourceState},begine_seconds=#{begineSeconds},complete_seconds=#{completeSeconds},message=#{message}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from resource_create_processes where id =#{id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from resource_create_processes
+	</select>
+		
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from resource_create_processes 
+    </select>
+    
+    <select id="selectAllForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from resource_create_processes limit #{0}, #{1}
+    </select>    
+
+</mapper>

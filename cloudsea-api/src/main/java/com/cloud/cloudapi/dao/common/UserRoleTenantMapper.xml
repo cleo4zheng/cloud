@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.UserRoleTenantMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.UserRoleTenant">
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="VARCHAR" />
+        <result column="role_id" property="roleId" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id,user_id,role_id,tenant_id
+	</sql>
+	
+	<!--basic super mapper -->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from user_role_tenant where id=#{id}
+    </select>
+    
+    <select id="selectByUserRoleTenantId" resultMap="BaseResultMap" >
+     select <include refid="all_fields" /> from user_role_tenant where user_id=#{0} and role_id=#{1} and tenant_id=#{2}
+    </select>
+    
+    <select id="selectByUserTenantId" resultMap="BaseResultMap" >
+     select <include refid="all_fields" /> from user_role_tenant where user_id=#{0} and tenant_id=#{1}
+    </select>
+    
+    <select id="selectByUserId" resultMap="BaseResultMap" >
+     select <include refid="all_fields" /> from user_role_tenant where user_id=#{0}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.UserRoleTenant">
+		insert into user_role_tenant ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{userId}, #{roleId}, #{tenantId}
+		)
+	</insert>
+	
+    <insert id="insertOrUpdate">
+     insert into user_role_tenant (<include refid="all_fields" /> )   
+     values  
+     (#{id}, #{userId}, #{roleId}, #{tenantId})  
+      ON DUPLICATE KEY UPDATE
+      user_id = #{userId}, role_id = #{roleId},tenant_id=#{tenantId}
+	</insert>
+	
+   <update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into user_role_tenant (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id},#{item.userId},#{item.roleId},#{item.tenantId})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       user_id = VALUES(user_id), role_id = VALUES(role_id), tenant_id=VALUES(tenant_id)
+    </update> 
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.UserRoleTenant">
+        update user_role_tenant set user_id = #{userId}, role_id = #{roleId},tenant_id=#{tenantId}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from user_role_tenant where id =#{id}
+	</delete>
+  
+    <delete id= "deleteByUserRoleTenantId" parameterType="java.lang.String">
+       delete from user_role_tenant where user_id=#{0} and role_id=#{1} and tenant_id=#{2}
+	</delete>
+	
+	<delete id= "deleteByUserTenantId" parameterType="java.lang.String">
+       delete from user_role_tenant where user_id=#{0} and tenant_id=#{1}
+	</delete>
+	
+   <!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+		select count(*) as num from user_role_tenant
+	</select>
+	
+    <select id="selectList" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from user_role_tenant 
+    </select>
+
+</mapper>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.MonitorTemplateMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.monitor.MonitorTemplate">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+	    <result column="name" property="name" jdbcType="VARCHAR" />
+	    <result column="default_flag" property="defaultFlag" jdbcType="BOOLEAN" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id,name, default_flag,description,million_seconds
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from monitor_templates where name=#{name}
+    </select>
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from monitor_templates where id=#{id}
+    </select>
+    
+    <select id="selectDefaultTemplate" resultMap="BaseResultMap">
+     select <include refid="all_fields" /> from monitor_templates where default_flag=true
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.monitor.MonitorTemplate">
+		insert into monitor_templates ( <include refid="all_fields" /> )
+		values (
+		#{id},#{name},#{defaultFlag},#{description},#{millionSeconds}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into monitor_templates (<include refid="all_fields" /> )   
+       values  
+       (#{id},#{name},#{defaultFlag},#{description},#{millionSeconds})  
+       ON DUPLICATE KEY UPDATE
+       name = #{name},default_flag=#{defaultFlag},description = #{description}, million_seconds = #{millionSeconds}
+	</insert>
+	
+	<update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into monitor_templates (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id},#{item.name},#{item.defaultFlag},#{item.description},#{item.millionSeconds})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       name = VALUES(name), default_flag = VALUES(default_flag), description=VALUES(description),million_seconds=VALUES(million_seconds)
+    </update> 
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.monitor.MonitorTemplate">
+        update monitor_templates set name = #{name},default_flag=#{defaultFlag},description = #{description}, million_seconds = #{millionSeconds}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from monitor_templates where id =#{id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from monitor_templates
+	</select>
+	
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from monitor_templates order by million_seconds DESC
+    </select>
+    
+</mapper>

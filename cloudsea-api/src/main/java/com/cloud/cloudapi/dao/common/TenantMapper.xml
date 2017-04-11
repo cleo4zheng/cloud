@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.TenantMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.Tenant">
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="domain_id" property="domain_id" jdbcType="VARCHAR" />
+        <result column="parent_id" property="parent_id" jdbcType="VARCHAR" />
+        <result column="quota_template_id" property="quota_template_id" jdbcType="VARCHAR" />
+        <result column="monitor_template_id" property="monitor_template_id" jdbcType="VARCHAR" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <result column="enabled" property="enabled" jdbcType="BOOLEAN" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+    
+	<resultMap id="userMap" type="com.cloud.cloudapi.pojo.common.CloudUser">
+	    <result column="userid" property="userid" jdbcType="VARCHAR" />
+        <result column="account" property="account" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="mail" property="mail" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="company" property="company" jdbcType="VARCHAR" />
+        <result column="customer_manager" property="customerManager" jdbcType="VARCHAR" />
+         <result column="enabled" property="enabled" jdbcType="BOOLEAN" />
+        <result column="create_time" property="create_time" jdbcType="BIGINT" /> 
+    </resultMap>
+    
+    <sql id="all_fields">
+        id,name, domain_id,parent_id,quota_template_id,monitor_template_id,description, enabled,million_seconds
+	</sql>
+	
+    <sql id="user_fields">
+        clouduser.userid, clouduser.account, clouduser.name,clouduser.password,clouduser.mail,clouduser.phone,clouduser.company,clouduser.customer_manager,clouduser.create_time
+	</sql>	
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from tenants where id=#{id}
+    </select>
+    
+    <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from tenants where name=#{name}
+    </select>
+    
+    <select id="selectTenantsByIds" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from tenants
+	 where id in
+       <foreach collection="list" item="id" open="(" close=")" separator=",">
+         #{id}
+       </foreach>
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Tenant">
+		insert into tenants ( <include refid="all_fields" /> )
+		values (
+		  #{id},#{name}, #{domain_id},#{parent_id},#{quota_template_id},#{monitor_template_id},#{description}, #{enabled},#{millionSeconds}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into tenants (<include refid="all_fields" /> )   
+       values  
+       ( #{id},#{name}, #{domain_id},#{parent_id},#{quota_template_id},#{monitor_template_id},#{description}, #{enabled},#{millionSeconds})  
+        ON DUPLICATE KEY UPDATE
+        name = #{name}, domain_id = #{domain_id},parent_id = #{parent_id},quota_template_id=#{quota_template_id},monitor_template_id=#{monitor_template_id},description = #{description}, enabled=#{enabled},million_seconds=#{millionSeconds}
+	</insert>
+	
+	<update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into tenants (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id}, #{item.name},#{item.domain_id}, #{item.parent_id},#{item.quota_template_id},#{item.monitor_template_id},#{item.description},#{item.enabled},#{item.millionSeconds})    
+       </foreach> ON DUPLICATE KEY UPDATE
+        name=VALUES(name),domain_id=VALUES(domain_id),parent_id=VALUES(parent_id),quota_template_id=#{quota_template_id},monitor_template_id=#{monitor_template_id},
+        description=VALUES(description),enabled=VALUES(enabled),million_seconds=VALUES(million_seconds)
+    </update>  
+    
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Tenant">
+        update tenants set name = #{name}, domain_id = #{domain_id},parent_id = #{parent_id},quota_template_id=#{quota_template_id},
+        monitor_template_id=#{monitor_template_id},description = #{description}, enabled=#{enabled},million_seconds=#{millionSeconds}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from tenants where id = #{id}
+	</delete>
+	
+    <select id="selectAllList" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from tenants order by million_seconds DESC
+    </select>
+    
+    <select id="selectListByParentId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from tenants where parent_id=#{parent_id}
+    </select>
+    
+    <select id="selectByQuotaTemplateId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from tenants where quota_template_id=#{quota_template_id}
+    </select>
+    
+    <select id="selectByMonitorTemplateId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from tenants where monitor_template_id=#{monitor_template_id}
+    </select>
+    
+    <select id="selectUserListByParentId" resultMap="userMap" parameterType="java.lang.String">
+     select distinct <include refid="user_fields" /> from tenants,user_tenant_domain, clouduser where tenants.parent_id=#{parent_id}
+     and tenants.id=user_tenant_domain.ostenantid
+	 and user_tenant_domain.clouduserid=clouduser.userid
+	 and clouduser.enabled=1
+    </select>
+    
+</mapper>

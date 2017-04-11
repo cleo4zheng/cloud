@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.BackupMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.Backup">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <result column="volume_id" property="volume_id" jdbcType="VARCHAR" />
+        <result column="size" property="size" jdbcType="INTEGER" />
+        <result column="volume_type" property="volume_type" jdbcType="VARCHAR" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id, name, status,tenant_id,volume_id,size,volume_type,million_seconds
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from backups where id=#{id}
+    </select>
+    
+    <select id="selectByInstanceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from backups where volume_id=#{volume_id}
+    </select>
+    
+   <select id="selectListByTenantIds" resultMap="BaseResultMap">
+    select <include refid="all_fields" />
+	 from backups
+	 where tenant_id in
+      <foreach collection="list" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+   </select> 
+   
+    <select id="selectListByInstanceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from backups where volume_id=#{volume_id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Backup">
+		insert into backups ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name}, #{status}, #{tenantId},#{volume_id}, #{size}, #{volume_type},#{millionSeconds}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+     insert into backups (<include refid="all_fields" /> )   
+     values  
+     (#{id}, #{name}, #{status}, #{tenantId},#{volume_id}, #{size}, #{volume_type},#{millionSeconds})  
+      ON DUPLICATE KEY UPDATE
+      status = #{status}, name = #{name},tenant_id = #{tenantId},volume_id = #{volume_id},
+      size = #{size},volume_type = #{volume_type},million_seconds = #{millionSeconds}
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Backup">
+        update backups set status = #{status}, name = #{name},tenant_id = #{tenantId},volume_id = #{volume_id},
+        size = #{size},volume_type = #{volume_type},million_seconds = #{millionSeconds}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from backups where id =#{id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from backups
+	</select>
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from backups 
+    </select>
+    
+    <select id="selectAllByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from backups where tenant_id = #{tenantId} order by million_seconds DESC
+    </select>
+    
+    <select id="selectListWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from backups limit #{limit}
+    </select>
+    
+    <select id="selectAllByTenantIdWithLimit" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from backups where tenant_id = #{0} order by million_seconds DESC limit #{1}
+    </select>
+    
+    <select id="countNumByInstanceStatus" resultType="java.lang.Integer" parameterType="java.lang.String">
+	  select count(*) as num from backups where status =#{status}
+	</select>
+     
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from backups  limit #{0}, #{1}
+    </select>    
+
+</mapper>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.ImageMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.Image">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+	    <result column="base_image_id" property="baseImageId" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <result column="instance_id" property="instanceId" jdbcType="VARCHAR" />
+        <result column="min_disk" property="minDisk" jdbcType="INTEGER" />
+        <result column="min_ram" property="minRam" jdbcType="INTEGER" />
+        <result column="size" property="size" jdbcType="BIGINT" />
+        <result column="visibility" property="visibility" jdbcType="VARCHAR" />
+        <result column="disk_format" property="diskFormat" jdbcType="VARCHAR" />
+        <result column="system_type" property="systemType" jdbcType="VARCHAR"/>
+        <result column="object_type" property="objectType" jdbcType="VARCHAR"/>
+        <result column="private_flag" property="privateFlag" jdbcType="BOOLEAN"/>
+        <result column="rating" property="rating" jdbcType="BOOLEAN"/>
+        <result column="unit_price" property="unitPrice" jdbcType="DOUBLE"/>
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id, base_image_id, name, status,tenant_id,instance_id,min_disk,min_ram,size,visibility,disk_format,system_type,object_type,private_flag,rating,unit_price,million_seconds
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from images where id=#{id}
+    </select>
+    
+    <select id="selectByInstanceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from images where instance_id=#{instanceId}
+    </select>
+    
+   <select id="selectListByTenantIds" resultMap="BaseResultMap">
+    select <include refid="all_fields" />
+	 from images
+	 where tenant_id in
+      <foreach collection="list" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+   </select> 
+   
+    <select id="selectListByInstanceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from images where instance_id=#{instanceId}
+    </select>
+    
+    <!-- 主键存在就进行更新操作 -->
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Image">
+		insert into images ( <include refid="all_fields" /> )
+		values (#{id}, #{baseImageId},#{name}, #{status}, #{tenantId}, #{instanceId}, #{minDisk},#{minRam},#{size},#{visibility},#{diskFormat},#{systemType},#{objectType},#{privateFlag},#{rating},#{unitPrice},#{millionSeconds})
+	</insert>
+	
+   <insert id="insertOrUpdate">
+       insert into images (<include refid="all_fields" /> )   
+       values  
+       (#{id}, #{baseImageId},#{name}, #{status}, #{tenantId}, #{instanceId},  #{minDisk},#{minRam},#{size},#{visibility},#{diskFormat},#{systemType},#{objectType},#{privateFlag},#{rating},#{unitPrice},#{millionSeconds})  
+        ON DUPLICATE KEY UPDATE
+        base_image_id = #{baseImageId},name = #{name},status = #{status},tenant_id = #{tenantId},instance_id = #{instanceId},min_disk=#{minDisk},min_ram=#{minRam},size = #{size},visibility = #{visibility},
+        disk_format = #{diskFormat},system_type = #{systemType},object_type = #{objectType},private_flag = #{privateFlag},rating=#{rating},unit_price=#{unitPrice},million_seconds = #{millionSeconds}
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Image">
+        update images set base_image_id = #{baseImageId},name = #{name},status = #{status},tenant_id = #{tenantId},instance_id = #{instanceId},min_disk=#{minDisk},min_ram=#{minRam},size = #{size},visibility = #{visibility},
+        disk_format = #{diskFormat},system_type = #{systemType},object_type = #{objectType},private_flag = #{privateFlag},rating=#{rating},unit_price=#{unitPrice},million_seconds = #{millionSeconds}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from images where id =#{id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from images
+	</select>
+	
+	<select id="selectPrivateImages" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from images where tenant_id = #{0} and private_flag = #{1}
+    </select>
+    
+    <select id="selectInstanceImages" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from images where instance_id = #{0} and private_flag = #{1}
+    </select>
+    
+   <select id="selectImagesById" resultType="com.cloud.cloudapi.pojo.openstackapi.forgui.Image">
+      select * from images e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+    <select id="selectListWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from images where private_flag = false order by million_seconds DESC limit #{limit}
+    </select>
+    
+    <select id="selectInstanceImagesWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from images where for_instance = true limit #{limit}
+    </select>
+    
+     <select id="selectAllPrivateImagesWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from images where private_flag = true order by million_seconds DESC limit #{limit} 
+    </select>   
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from images where private_flag = false order by million_seconds DESC
+    </select>
+ 
+     <select id="selectAllInstanceImages" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from images where for_instance = true 
+    </select>
+    
+    <select id="selectAllByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from images where tenant_id = #{tenantId}
+    </select>
+ 
+    <select id="selectAllPrivateImages" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from images where private_flag = true and tenant_id = #{tenantId} order by million_seconds DESC
+    </select>   
+   
+    <select id="selectPrivateImagesWithLimit" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from images where private_flag = true and tenant_id = #{0} order by million_seconds DESC limit #{1}
+    </select>  
+     
+    <select id="selectAllByTenantIdWithLimit" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from images where tenant_id = #{0} limit #{1}
+    </select>
+    
+    <select id="selectImagesByType" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from images where system_type = #{systemType}
+    </select>
+    
+    <select id="countNumByInstanceStatus" resultType="java.lang.Integer" parameterType="java.lang.String">
+	  select count(*) as num from images where status =#{status}
+	</select>
+	
+	<select id="countNumByImageFlag" resultType="java.lang.Integer" parameterType="java.lang.Boolean">
+	  select count(*) as num from images where private_flag =#{privateFlag}
+	</select>
+	
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from images  limit #{0}, #{1}
+    </select>    
+
+</mapper>

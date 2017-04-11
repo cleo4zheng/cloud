@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cloud.cloudapi.dao.common.FloatingIPMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.FloatingIP">
+	    <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="router_id" property="routerId" jdbcType="VARCHAR" />
+        <result column="port_id" property="port_id" jdbcType="VARCHAR" />
+        <result column="network_id" property="networkId" jdbcType="VARCHAR" />
+        <result column="instance_id" property="instanceId" jdbcType="VARCHAR" />
+        <result column="loadbalancer_id" property="loadbalancerId" jdbcType="VARCHAR" />
+        <result column="floating_ip_address" property="floatingIpAddress" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="VARCHAR" />
+        <result column="unit_price" property="unitPrice" jdbcType="DOUBLE" />
+        <result column="assigned" property="assigned" jdbcType="BOOLEAN" />
+        <result column="bandwith" property="bandwith" jdbcType="INTEGER" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+
+    <sql id="all_fields">
+        id,name,tenant_id,status,router_id,port_id,network_id,instance_id,loadbalancer_id,floating_ip_address,type,unit_price,bandwith,assigned,million_seconds
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from floatingips where id=#{id}
+    </select>
+    
+    <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from floatingips where name=#{name}
+    </select>
+    
+    <select id="selectByAddress" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from floatingips where floating_ip_address=#{floatingIpAddress}
+    </select>
+    
+    <select id="selectByPortId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from floatingips where port_id=#{port_id}
+    </select>
+    
+    <select id="selectByInstanceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from floatingips where instance_id=#{instanceId}
+    </select>
+    
+    <select id="selectByRouterId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from floatingips where router_id=#{routerId}
+    </select>
+    
+    <select id="selectListByFloatingIps" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from floatingips
+	 where floating_ip_address in
+       <foreach collection="list" item="id" open="(" close=")" separator=",">
+         #{id}
+       </foreach>
+    </select>
+   
+   <select id="selectListByTenantIds" resultMap="BaseResultMap">
+    select <include refid="all_fields" />
+	 from floatingips
+	 where tenant_id in
+      <foreach collection="list" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+   </select> 
+    
+   <select id="selectByIds" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from floatingips e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+    <select id="selectByNetworkId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from floatingips where network_id=#{networkId}
+    </select>
+    
+    <select id="selectListByInstanceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from floatingips where instance_id=#{instanceId}
+    </select>
+    
+    <select id="selectListByRouterId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from floatingips where router_id=#{routerId}
+    </select>
+    
+    <select id="selectListByNetworkId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from floatingips where network_id=#{networkId}
+    </select>
+    
+    <select id="selectListByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from floatingips where tenant_id=#{tenantId}
+    </select>
+    
+    <select id="selectListByTenantIdAndNetId" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from floatingips where tenant_id=#{0} and network_id=#{1}
+    </select>
+    
+    
+    <select id="selectByFloatingIp" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from floatingips where floating_ip_address=#{floatingIpAddress}
+    </select> 
+    
+    <select id="selectListByTenantIdWithLimit" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from floatingips where tenant_id=#{0} limit #{1}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.FloatingIP">
+		insert into floatingips ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name},#{tenantId}, #{status},#{routerId},#{port_id},#{networkId},#{instanceId},#{loadbalancerId},#{floatingIpAddress},#{type},#{unitPrice},#{bandwith},#{assigned},#{millionSeconds}
+		)
+	</insert>
+	
+   <insert id="insertOrUpdate">
+       insert into floatingips (<include refid="all_fields" /> )   
+       values  
+       (#{id}, #{name},#{tenantId}, #{status},#{routerId},#{port_id},#{networkId},#{instanceId},#{loadbalancerId},#{floatingIpAddress},#{type},#{unitPrice},#{bandwith},#{assigned},#{millionSeconds})  
+        ON DUPLICATE KEY UPDATE
+        name=#{name},tenant_id=#{tenantId},status=#{status},router_id=#{routerId},port_id=#{port_id},network_id=#{networkId},instance_id=#{instanceId},loadbalancer_id=#{loadbalancerId},
+        floating_ip_address=#{floatingIpAddress},type=#{type},unit_price=#{unitPrice},bandwith=#{bandwith},assigned=#{assigned},million_seconds=#{millionSeconds}
+	</insert>
+	
+	<update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into floatingips (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id}, #{item.name},#{item.tenantId}, #{item.status},#{item.routerId},#{item.port_id},#{item.networkId},#{item.instanceId},#{item.loadbalancerId},
+         #{item.floatingIpAddress},#{item.type},#{item.unitPrice},#{item.bandwith},#{item.assigned},#{item.millionSeconds})    
+       </foreach> ON DUPLICATE KEY UPDATE
+        name=VALUES(name),tenant_id=VALUES(tenant_id),status=VALUES(status),router_id=VALUES(router_id),port_id=VALUES(port_id),network_id=VALUES(network_id),instance_id=VALUES(instance_id),loadbalancer_id=VALUES(loadbalancer_id),
+        floating_ip_address=VALUES(floating_ip_address),type=VALUES(type),unit_price=VALUES(unit_price),bandwith=VALUES(bandwith),assigned=VALUES(assigned),million_seconds=VALUES(million_seconds)
+    </update>  
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.FloatingIP">
+        update floatingips set name=#{name},tenant_id=#{tenantId},status=#{status},router_id=#{routerId},port_id=#{port_id},network_id=#{networkId},
+        instance_id=#{instanceId},loadbalancer_id=#{loadbalancerId},floating_ip_address=#{floatingIpAddress},type=#{type},unit_price=#{unitPrice},bandwith=#{bandwith},assigned=#{assigned},million_seconds=#{millionSeconds}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from floatingips where id =#{id}
+	</delete>
+  
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from floatingips
+	</select>
+	
+   <!-- self dao -->
+	<select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from floatingips 
+    </select>
+     
+    <select id="selectAllForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from floatingips  limit #{0}, #{1}
+    </select>  
+ 
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.CrmInfoMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.crm.CrmInfo">
+	    <result column="ddh" property="ddh" jdbcType="LONGVARCHAR" />
+        <result column="ztmc" property="ztmc" jdbcType="LONGVARCHAR" />
+        <result column="ztbh" property="ztbh" jdbcType="LONGVARCHAR" />
+        <result column="hth" property="hth" jdbcType="LONGVARCHAR" />
+        <result column="bm" property="bm" jdbcType="LONGVARCHAR" />
+        <result column="ry" property="ry" jdbcType="LONGVARCHAR" />
+        <result column="disabled" property="disabled" jdbcType="NUMERIC" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        ddh, ztmc, ztbh, hth, bm, ry
+	</sql>
+	
+	<sql id="all_fields_include_status">
+        ddh, ztmc, ztbh, hth, bm, ry, disabled
+	</sql>
+	
+	<!-- basic super dao -->
+    
+    <select id="selectAllCrmInfoByDisableStatus" resultMap="BaseResultMap">
+    	select <include refid="all_fields"/>
+    	from crm_info
+    </select>
+    
+   
+    
+
+</mapper>

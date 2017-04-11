@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.MonitorRuleMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.MonitorRule">
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="item" property="item" jdbcType="VARCHAR" />
+        <result column="period" property="period" jdbcType="VARCHAR" />
+        <result column="condition" property="condition" jdbcType="VARCHAR" />
+        <result column="threshold" property="threshold" jdbcType="VARCHAR" />
+        <result column="unit" property="unit" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="all_fields">
+        id, item, period, monitor_rules.condition, threshold, unit, monitor_rules.created_at
+	</sql>
+    
+    <!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from monitor_rules where id=#{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.MonitorRule">
+		INSERT INTO monitor_rules
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			id
+			<if test="item != null and item != ''"> ,item </if>
+			<if test="period != null and period != ''"> ,period </if>
+			<if test="condition != null and condition != ''"> ,monitor_rules.condition </if>
+			<if test="threshold != null and threshold != ''"> ,threshold </if>
+			<if test="unit != null and unit != ''"> ,unit </if>
+			<if test="createdAt != null and createdAt != ''"> ,created_at </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{id}
+			<if test="item != null and item != ''"> ,#{item} </if>
+			<if test="period != null and period != ''"> ,#{period} </if>
+			<if test="condition != null and condition != ''"> ,#{condition} </if>
+			<if test="threshold != null and threshold != ''"> ,#{threshold} </if>
+			<if test="unit != null and unit != ''"> ,#{unit} </if>
+			<if test="createdAt != null and createdAt != ''"> ,#{createdAt} </if>
+		</trim>
+	</insert>
+
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Monitor">
+        update monitor_rules
+         <set>
+			<if test="item != null and item != ''"> item = #{item} </if>
+			<if test="period != null and period != ''"> period = #{period} </if>
+			<if test="condition != null and condition != ''"> monitor_rules.condition = #{condition} </if>
+			<if test="threshold != null and threshold != ''"> threshold = #{threshold} </if>
+			<if test="unit != null and unit != ''"> unit = #{unit} </if>
+			<if test="createdAt != null and createdAt != ''"> created_at = #{createdAt} </if>
+		</set>
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from monitor_rules where id =#{id}
+	</delete>
+	
+	<!-- self dao -->
+	
+	<select id="selectListByMonitor" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> 
+     from monitor_rules
+     LEFT JOIN monitors_monitor_rules ON monitor_rule_id = id
+     where monitor_id=#{monitor_id}
+    </select>
+	
+	<insert id="insertMonitorRuleRelations">
+		INSERT INTO monitors_monitor_rules
+		  (monitor_id, monitor_rule_id)
+		VALUES
+		  (#{monitor_id}, #{monitor_rule_id})
+	</insert>
+	
+	<delete id="deleteMonitorRule">
+		DELETE FROM monitor_rules
+		where id = #{rule_id}
+	</delete>
+	
+	<delete id="deleteMonitorRuleRelations">
+		DELETE FROM monitors_monitor_rules
+		where monitor_id = #{monitor_id} and monitor_rule_id = #{rule_id}
+	</delete>
+	
+	<delete id="deleteRelationsForMonitorByMonitoId" parameterType="java.lang.String">
+		DELETE FROM monitors_monitor_rules where monitor_id = #{monitor_id}
+	</delete>
+</mapper>

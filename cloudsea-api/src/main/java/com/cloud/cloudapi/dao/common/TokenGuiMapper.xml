@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.TokenGuiMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.common.TokenGui">
+        <id column="guitokenid" property="tokenid" jdbcType="VARCHAR" />
+        <result column="tenantuserid" property="tenantuserid" jdbcType="VARCHAR" />
+        <result column="createtime" property="createTime" jdbcType="BIGINT" />
+        <result column="expirestime" property="expiresTime" jdbcType="BIGINT" />
+        <result column="ostenantid" property="tenantid" jdbcType="VARCHAR" />
+        <result column="osdomainid" property="domainid" jdbcType="VARCHAR" />
+        <result column="name" property="tenantname" jdbcType="VARCHAR" />       
+    </resultMap>
+ 
+    <sql id="all_fields">     
+        guitokenid,tenantuserid,createtime,expirestime
+ 	</sql>  
+	
+    <sql id="all_fields_forlink">
+       tokengui.guitokenid,tokengui.tenantuserid,tokengui.createtime,tokengui.expirestime,user_tenant_domain.ostenantid,user_tenant_domain.osdomainid,tenants.name
+ 	</sql> 	
+	
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields_forlink" /> from tokengui,user_tenant_domain,tenants
+      where tokengui.guitokenid=#{id}
+      and user_tenant_domain.id = tokengui.tenantuserid
+      and user_tenant_domain.ostenantid = tenants.id
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.common.TokenGui">
+		insert into tokengui ( <include refid="all_fields" /> )
+		values (
+		#{tokenid}, #{tenantuserid}, #{createTime}, #{expiresTime}
+		)
+	</insert>
+	
+    <update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into tokengui (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.tokenid},#{item.tenantuserid}, #{item.createTime}, #{item.expiresTime})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       tenantuserid = VALUES(tenantuserid),createtime = VALUES(createtime),expirestime = VALUES(expirestime)
+    </update>
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.common.TokenGui">
+        update tokengui set tenantuserid = #{tenantuserid}, 
+        createtime = #{createTime}, expirestime=#{expiresTime}
+        where guitokenid = #{tokenid}
+    </update>
+     
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from tokengui where guitokenid =#{id}
+	</delete>
+	
+<!-- self dao -->	
+    <select id="countNum" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select count(*) as num from tokengui where guitokenid = #{guitokenid}
+	</select>
+	
+    <select id="selectListByUser" resultMap="BaseResultMap" parameterType= "java.lang.String"> 
+     select <include refid="all_fields_forlink" /> from tokengui,user_tenant_domain,tenants
+     where user_tenant_domain.id = tokengui.tenantuserid 
+	 and user_tenant_domain.clouduserid=#{userid}
+	 and user_tenant_domain.ostenantid = tenants.id
+    </select>
+    
+    <select id="selectListByUserId" resultMap="BaseResultMap" parameterType= "java.lang.String"> 
+     select <include refid="all_fields" /> from tokengui
+     where tenantuserid = #{tenantuserid}
+    </select>
+    
+    <!-- xml规则不允许的字符使用时，需用cdata声明 -->  
+    <delete id="deleteBytime" parameterType="java.lang.Long">
+       delete from tokengui where
+        <![CDATA[expirestime  < #{nowtime}]]>     
+	</delete>
+</mapper>

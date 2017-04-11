@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.HostDetailMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.HostDetail">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+	    <result column="name" property="name" jdbcType="VARCHAR" />
+	    <result column="type" property="type" jdbcType="VARCHAR" />
+        <result column="unit" property="unit" jdbcType="VARCHAR" />
+        <result column="total" property="total" jdbcType="INTEGER" />
+        <result column="reserved" property="reserved" jdbcType="INTEGER" />
+        <result column="used" property="used" jdbcType="INTEGER" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id,name,type, unit, total,reserved,used
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from host_details where id=#{id}
+    </select>
+       
+    <select id="getHostDetailsById" resultMap="BaseResultMap">
+        select * from host_details e where e.id in
+        <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+        </foreach>
+    </select>
+    
+    <select id="selectByHostName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from host_details where host_name=#{hostName}
+    </select> 
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.HostDetail">
+		insert into host_details ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name}, #{type}, #{unit}, #{total}, #{reserved}, #{used}
+		)
+	</insert>
+	
+   <update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into host_details (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id}, #{item.name},#{item.type}, #{item.unit},#{item.total},#{item.reserved},#{item.used})    
+       </foreach> ON DUPLICATE KEY UPDATE
+        name=VALUES(name),type=VALUES(type),unit=VALUES(unit),total=VALUES(total),reserved=VALUES(reserved),
+        used=VALUES(used)
+    </update> 
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.HostDetail">
+        update host_details set name = #{name},type = #{type},unit = #{unit}, total = #{total},reserved = #{reserved},used = #{used}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from host_details where id =#{id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from host_details
+	</select>
+	
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from host_details 
+    </select>
+    
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from host_details limit #{0}, #{1}
+    </select>    
+
+</mapper>

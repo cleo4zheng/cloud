@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.LoadbalancerPoolMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.LBPool">
+	    <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenant_id" jdbcType="VARCHAR" />
+        <result column="subnet_id" property="subnet_id" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="lb_algorithm" property="lb_algorithm" jdbcType="VARCHAR" />
+        <result column="protocol" property="protocol" jdbcType="VARCHAR" />
+        <result column="health_monitor_id" property="health_monitor_id" jdbcType="VARCHAR" />
+        <result column="listener_id" property="listener_id" jdbcType="VARCHAR" />
+        <result column="loadbalancers_id" property="loadbalancer_id" jdbcType="VARCHAR" />
+        <result column="members_id" property="members_id" jdbcType="VARCHAR" />
+        <result column="status_description" property="status_description" jdbcType="VARCHAR" />
+        <result column="provider" property="provider" jdbcType="VARCHAR" />
+        <result column="admin_state_up" property="admin_state_up" jdbcType="BOOLEAN" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+    </resultMap>
+
+    
+    <sql id="all_fields">
+        id,name,tenant_id,subnet_id,status,lb_algorithm,protocol,health_monitor_id,listener_id,
+        loadbalancers_id,members_id,status_description,provider,admin_state_up,description
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from loadbalancer_pools where id=#{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.LBPool">
+		insert into loadbalancer_pools ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name},#{tenant_id}, #{subnet_id},#{status},#{lb_algorithm},#{protocol},#{health_monitor_id},#{listener_id},
+		#{loadbalancer_id},#{members_id},#{status_description},#{provider},#{admin_state_up},#{description}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into loadbalancer_pools (<include refid="all_fields" /> )   
+       values  
+       (#{id}, #{name},#{tenant_id}, #{subnet_id},#{status},#{lb_algorithm},#{protocol},#{health_monitor_id},#{listener_id},
+		#{loadbalancer_id},#{members_id},#{status_description},#{provider},#{admin_state_up},#{description})  
+        ON DUPLICATE KEY UPDATE
+        name=#{name},tenant_id=#{tenant_id},subnet_id=#{subnet_id},status=#{status},lb_algorithm=#{lb_algorithm},
+        protocol=#{protocol},health_monitor_id=#{health_monitor_id},listener_id=#{listener_id},loadbalancers_id=#{loadbalancer_id},
+        members_id=#{members_id},status_description=#{status_description},provider=#{provider},admin_state_up=#{admin_state_up},description=#{description}
+	</insert>
+	
+	<!-- 
+	<insert id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into loadbalancer_pools (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id}, #{item.name},#{item.tenant_id}, #{item.subnet_id},#{item.status},#{item.lb_algorithm},#{item.protocol},#{item.health_monitor_id},#{item.listener_id},
+		#{item.loadbalancers_id},#{item.members_id},#{item.status_description},#{item.provider},#{item.admin_state_up},#{item.description})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       name=#{item.name},tenant_id=#{item.tenant_id},subnet_id=#{item.subnet_id},status=#{item.status},lb_algorithm=#{item.lb_algorithm},
+       protocol=#{item.protocol},health_monitor_id=#{item.health_monitor_id},listener_id=#{item.listener_id},loadbalancers_id=#{item.loadbalancers_id},
+       members_id=#{item.members_id},status_description=#{item.status_description},provider=#{item.provider},admin_state_up=#{item.admin_state_up},description=#{item.description}
+    </insert> 
+    -->
+    
+ 	<update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into loadbalancer_pools (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id}, #{item.name},#{item.tenant_id}, #{item.subnet_id},#{item.status},#{item.lb_algorithm},#{item.protocol},#{item.health_monitor_id},#{item.listener_id},
+		#{item.loadbalancer_id},#{item.members_id},#{item.status_description},#{item.provider},#{item.admin_state_up},#{item.description})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       name=VALUES(name),tenant_id=VALUES(tenant_id),subnet_id=VALUES(subnet_id),status=VALUES(status),lb_algorithm=VALUES(lb_algorithm),
+       protocol=VALUES(protocol),health_monitor_id=VALUES(health_monitor_id),listener_id=VALUES(listener_id),loadbalancers_id=VALUES(loadbalancers_id),
+       members_id=VALUES(members_id),status_description=VALUES(status_description),provider=VALUES(provider),admin_state_up=VALUES(admin_state_up),description=VALUES(description)
+    </update> 
+       
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.LBPool">
+        update loadbalancer_pools set name=#{name},tenant_id=#{tenant_id},subnet_id=#{subnet_id},status=#{status},lb_algorithm=#{lb_algorithm},
+        protocol=#{protocol},health_monitor_id=#{health_monitor_id},listener_id=#{listener_id},loadbalancers_id=#{loadbalancer_id},
+        members_id=#{members_id},status_description=#{status_description},provider=#{provider},admin_state_up=#{admin_state_up},description=#{description}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from loadbalancer_pools where id =#{id}
+	</delete>
+  
+   <!-- self dao -->
+	<select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from loadbalancer_pools 
+    </select>
+    
+    <select id="selectAllByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from loadbalancer_pools where tenant_id = #{tenant_id)}
+    </select>
+   
+   	<select id="selectListWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from loadbalancer_pools limit #{limit} 
+    </select>
+     
+    <select id="selectAllByTenantIdWithLimit" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from loadbalancer_pools where tenant_id = #{0} limit #{1}
+    </select>
+    
+    <select id="selectAllForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from loadbalancer_pools limit #{0}, #{1}
+    </select>  
+ 
+</mapper>

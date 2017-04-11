@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.TenantEndpointMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.common.TenantEndpoint">
+	    <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="ostenantid" property="ostenantid" jdbcType="VARCHAR" />
+        <result column="servicetype" property="serviceType" jdbcType="VARCHAR" />
+        <result column="servicename" property="serviceName" jdbcType="VARCHAR" />
+        <result column="publicurl" property="publicUrl" jdbcType="VARCHAR" />
+        <result column="internalurl" property="internalUrl" jdbcType="VARCHAR" />
+        <result column="adminurl" property="adminUrl" jdbcType="VARCHAR" />
+        <result column="belongregion" property="belongRegion" jdbcType="VARCHAR" />       
+    </resultMap>
+
+    
+    <sql id="all_fields">
+        id,ostenantid,servicetype, servicename,publicurl,internalurl,adminurl,belongregion
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from tenant_endpoint where id=#{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.common.TenantEndpoint">
+		insert into tenant_endpoint ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{ostenantid},#{serviceType}, #{serviceName},#{publicUrl},#{internalUrl},#{adminUrl},#{belongRegion}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.common.TenantEndpoint">
+        update tenant_endpoint set publicurl=#{publicUrl},internalurl=#{internalUrl},adminurl=#{adminUrl},belongregion=#{belongRegion}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from tenant_endpoint where id =#{id}
+	</delete>
+  
+   <!-- self dao -->
+	
+	<select id="selectAll" resultMap="BaseResultMap" >
+     select <include refid="all_fields" />
+	 from tenant_endpoint
+    </select>
+    
+    <select id="selectListByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" />
+	 from tenant_endpoint where  ostenantid=#{ostenantid}
+    </select>
+    
+    <delete id="deleteByTenantId" parameterType="java.lang.String">
+       delete from tenant_endpoint where ostenantid=#{ostenantid}
+	</delete>
+	
+	<delete id="deleteByTenantAndRegionId" parameterType="java.lang.String">
+       delete from tenant_endpoint where ostenantid=#{ostenantid} and belongregion=#{belongRegion}
+	</delete>
+
+    <delete id="deleteOne" parameterType="com.cloud.cloudapi.pojo.common.TenantEndpoint">
+       delete from tenant_endpoint where ostenantid=#{ostenantid} and servicetype=#{serviceType} and belongregion=#{belongRegion}
+	</delete>
+ 
+     <delete id="deleteByIds">
+     delete from tenant_endpoint
+	 where id in
+       <foreach collection="list" item="id" open="(" close=")" separator=",">
+         #{id}
+       </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.QuotaMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.Quota">
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <result column="quota_type" property="quotaType" jdbcType="VARCHAR" />
+        <result column="shared" property="shared" jdbcType="BOOLEAN" />
+        <result column="quota_details_id" property="quotaDetailsId" jdbcType="VARCHAR" />  
+    </resultMap>
+
+    <sql id="all_fields">
+        id,user_id, tenant_id,quota_type,shared,quota_details_id
+	</sql>
+	
+   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from quotas where id=#{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Quota">
+		insert into quotas ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{userId}, #{tenantId},#{quotaType}, #{shared},#{quotaDetailsId}
+		)
+	</insert>
+	
+    <insert id="insertOrUpdate">
+       insert into quotas (<include refid="all_fields" /> )   
+       values  
+       (#{id}, #{userId}, #{tenantId},#{quotaType}, #{shared},#{quotaDetailsId})  
+        ON DUPLICATE KEY UPDATE
+        user_id = #{userId},tenant_id = #{tenantId},quota_type = #{quotaType},
+        shared = #{shared},quota_details_id = #{quotaDetailsId}
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Quota">
+        update quotas set user_id = #{userId},tenant_id = #{tenantId},quota_type = #{quotaType}, shared = #{shared},quota_details_id = #{quotaDetailsId}
+        where id = #{id}
+    </update>
+    
+    <update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into quotas (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id},#{item.userId},#{item.tenantId},#{item.quotaType},#{item.shared},#{item.quotaDetailsId})    
+       </foreach> ON DUPLICATE KEY UPDATE
+        user_id = VALUES(user_id), tenant_id = VALUES(tenant_id),quota_type = VALUES(quota_type),
+        shared = VALUES(shared),quota_details_id = VALUES(quota_details_id)
+    </update> 
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from quotas where id =#{id}
+	</delete>
+	
+	<delete id="deleteByIds">
+     delete from quotas
+	 where id in
+       <foreach collection="list" item="id" open="(" close=")" separator=",">
+         #{id}
+       </foreach>
+    </delete>
+    
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from quotas
+	</select>
+	
+	<select id="selectAllByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from quotas where tenant_id = #{tenantId}
+    </select>
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from quotas 
+    </select>
+    
+    <select id="selectQuota" resultMap="BaseResultMap" >
+      select <include refid="all_fields" />
+	  from quotas where tenant_id = #{0} and quota_type = #{1}
+    </select>
+    
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from quotas limit #{0}, #{1}
+    </select>    
+      
+</mapper>

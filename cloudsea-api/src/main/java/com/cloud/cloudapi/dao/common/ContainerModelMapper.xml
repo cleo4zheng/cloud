@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.ContainerModelMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.ContainerModel">
+	    <result column="id" property="uuid" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="flavor_id" property="flavor_id" jdbcType="VARCHAR" />
+        <result column="external_network_id" property="external_network_id" jdbcType="VARCHAR" />
+        <result column="keypair_id" property="keypair_id" jdbcType="VARCHAR" />
+        <result column="coe" property="coe" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id,name,flavor_id,external_network_id,keypair_id,coe,tenant_id
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from container_models where id=#{uuid}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.ContainerModel">
+		insert into container_models ( <include refid="all_fields" /> )
+		values (
+		#{uuid}, #{name}, #{flavor_id},#{external_network_id},#{keypair_id}, #{coe}, #{tenantId}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.ContainerModel">
+        update container_models set name = #{name}, flavor_id = #{flavor_id},external_network_id = #{external_network_id},
+        keypair_id = #{keypair_id},coe = #{coe},tenant_id = #{tenantId}
+        where id = #{uuid}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from container_models where id =#{uuid}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from container_models
+	</select>
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from container_models 
+    </select>
+    
+    <select id="selectAllByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from container_models where tenant_id = #{tenantId}
+    </select>
+    
+    <select id="selectListWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from container_models limit #{limit}
+    </select>
+    
+    <select id="selectAllByTenantIdWithLimit" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from container_models where tenant_id = #{0} limit #{1}
+    </select>
+    
+    <select id="countNumByContainereflavorId" resultType="java.lang.Integer" parameterType="java.lang.String">
+	  select count(*) as num from container_models where flavor_id =#{flavor_id}
+	</select>
+     
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from container_models  limit #{0}, #{1}
+    </select>    
+
+</mapper>

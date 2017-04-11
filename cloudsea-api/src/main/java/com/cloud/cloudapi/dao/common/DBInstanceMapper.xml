@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.DBInstanceMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.DBInstance">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="core" property="core" jdbcType="VARCHAR" />
+        <result column="ram" property="ram" jdbcType="VARCHAR" />
+        <result column="system_volume" property="systemVolumeSize" jdbcType="INTEGER" />
+        <result column="system_volume_type" property="systemVolumeType" jdbcType="VARCHAR" />
+        <result column="data_volume" property="dataVolumeSize" jdbcType="INTEGER" />
+        <result column="data_volume_type" property="dataVolumeType" jdbcType="VARCHAR" />
+        <result column="datastore_version" property="dataStoreVersion" jdbcType="VARCHAR" />
+        <result column="datastore_type" property="dataStoreType" jdbcType="VARCHAR" />
+        <result column="fixedips" property="fixedips" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <result column="flavor_id" property="flavorId" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="VARCHAR" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id, name, status,core,ram,system_volume,system_volume_type,data_volume,data_volume_type,datastore_version,datastore_type,fixedips,tenant_id,flavor_id,type,million_seconds
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from dbinstances where id=#{id}
+    </select>
+    
+    <select id="selectByIds" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from dbinstances e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.DBInstance">
+		insert into dbinstances ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name}, #{status},#{core}, #{ram},#{systemVolumeSize},#{systemVolumeType},#{dataVolumeSize},#{dataVolumeType},
+		#{dataStoreVersion}, #{dataStoreType}, #{fixedips}, #{tenantId}, #{flavorId},#{type},#{millionSeconds}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.DBInstance">
+        update dbinstances set name = #{name}, status = #{status},core= #{core}, ram = #{ram}, system_volume = #{systemVolumeSize},system_volume_type = #{systemVolumeType},
+        data_volume = #{dataVolumeSize}, data_volume_type = #{dataVolumeSize}, datastore_version = #{dataStoreVersion}, datastore_type = #{dataStoreType},
+        fixedips = #{fixedips},tenant_id = #{tenantId},flavor_id = #{flavorId},type= #{type},million_seconds = #{millionSeconds}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from dbinstances where id =#{id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from dbinstances
+	</select>
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from dbinstances 
+    </select>
+    
+    <select id="selectAllByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from dbinstances where tenant_id = #{0}
+    </select>
+    
+    <select id="selectListWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from dbinstances limit #{limit}
+    </select>
+    
+    <select id="selectAllByTenantIdWithLimit" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from dbinstances where tenant_id = #{0} limit #{1}
+    </select>
+    
+    <select id="countNumByDBInstanceeStatus" resultType="java.lang.Integer" parameterType="java.lang.String">
+	  select count(*) as num from dbinstances where status =#{status}
+	</select>
+     
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from dbinstances  limit #{0}, #{1}
+    </select>
+    
+    <select id="selectAllByTenantIdAndType" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from dbinstances where tenant_id = #{0} and type = #{1}
+    </select>    
+    
+    <select id="selectAllByTenantIdAndTypeWithLimit" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from dbinstances where tenant_id = #{0} and type = #{2} limit #{1}
+    </select>
+    
+    <insert id="insertOrUpdate">
+       insert into dbinstances (<include refid="all_fields" /> )   
+       values  
+       (#{id}, #{name}, #{status},#{core}, #{ram},#{systemVolumeSize},#{systemVolumeType},#{dataVolumeSize},#{dataVolumeType},
+		#{dataStoreVersion}, #{dataStoreType}, #{fixedips}, #{tenantId}, #{flavorId},#{type},#{millionSeconds})  
+        ON DUPLICATE KEY UPDATE
+       name = #{name}, status = #{status},core= #{core}, ram = #{ram}, system_volume = #{systemVolumeSize},system_volume_type = #{systemVolumeType},
+       data_volume = #{dataVolumeSize}, data_volume_type = #{dataVolumeSize}, datastore_version = #{dataStoreVersion}, datastore_type = #{dataStoreType},
+       fixedips = #{fixedips},tenant_id = #{tenantId},flavor_id = #{flavorId},type= #{type},million_seconds = #{millionSeconds}
+	</insert>
+
+</mapper>

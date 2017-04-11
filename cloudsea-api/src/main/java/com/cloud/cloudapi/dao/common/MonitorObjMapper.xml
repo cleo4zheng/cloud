@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.MonitorObjMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.MonitorObj">
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="VARCHAR" />
+        <result column="monitor_id" property="monitor_id" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="all_fields">
+        id, name, status, monitor_objs.type, monitor_id, created_at
+	</sql>
+	
+	<select id="selectAllList" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from monitor_objs 
+    </select>
+    
+    <select id="selectListByMonitorId" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from monitor_objs
+	 where monitor_id = #{monitor_id}
+    </select>
+    
+    <select id="selectListById" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from monitor_objs
+	 where id = #{id}
+    </select>
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from monitor_objs where id=#{id} limit 1
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.MonitorObj">
+		insert into monitor_objs ( <include refid="all_fields" /> )
+		values (
+		  #{id}, #{name}, #{status}, #{type}, #{monitor_id}, #{createdAt}
+		)
+	</insert>
+
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.MonitorObj">
+        update monitor_objs set name = #{name}, status = #{status}, monitor_id=#{monitor_id}, created_at=#{createdAt}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from monitor_objs where id =#{id}
+	</delete>
+	
+	<delete id= "deleteResourcesByIds">
+       delete from monitor_objs where id in
+       <foreach collection="ids" item="id" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+	</delete>
+	
+	<delete id= "deleteResource">
+       delete from monitor_objs where id =#{id} and monitor_id = #{monitor_id}
+	</delete>
+	
+	<delete id= "deleteResourceByMonitorId">
+       delete from monitor_objs where monitor_id = #{monitor_id}
+	</delete>
+	
+	<update id="updateName">
+        update monitor_objs set name = #{name}
+        where id = #{id}
+    </update>
+	
+</mapper>

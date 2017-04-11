@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.LoadbalancerMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.Loadbalancer">
+	    <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenant_id" jdbcType="VARCHAR" />
+        <result column="vip_address" property="vip_address" jdbcType="VARCHAR" />
+        <result column="vip_port_id" property="vip_port_id" jdbcType="VARCHAR" />
+        <result column="vip_subnet_id" property="vip_subnet_id" jdbcType="VARCHAR" />
+        <result column="floatingIp" property="floatingIp" jdbcType="VARCHAR" />
+        <result column="operating_status" property="operating_status" jdbcType="VARCHAR" />
+        <result column="provisioning_status" property="provisioning_status" jdbcType="VARCHAR" />
+        <result column="provider" property="provider" jdbcType="VARCHAR" />
+        <result column="listenerIds" property="listenerIds" jdbcType="VARCHAR" />
+        <result column="poolIds" property="poolIds" jdbcType="VARCHAR" />
+        <result column="admin_state_up" property="admin_state_up" jdbcType="BOOLEAN" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+    </resultMap>
+
+    
+    <sql id="all_fields">
+        id,name,tenant_id,vip_address,vip_port_id,vip_subnet_id,floatingIp,operating_status,provisioning_status,provider,
+        listenerIds,poolIds,admin_state_up,million_seconds,description
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from loadbalancers where id=#{id}
+    </select>
+    
+    <select id="selectByIds" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from loadbalancers e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+   <select id="selectListByTenantIds" resultMap="BaseResultMap">
+    select <include refid="all_fields" />
+	 from loadbalancers
+	 where tenant_id in
+      <foreach collection="list" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+   </select> 
+   
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Loadbalancer">
+		insert into loadbalancers ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name},#{tenant_id}, #{vip_address},#{vip_port_id},#{vip_subnet_id},#{floatingIp},#{operating_status},#{provisioning_status},#{provider},
+		#{listenerIds},#{poolIds},#{admin_state_up},#{millionSeconds},#{description}
+		)
+	</insert>
+	
+    <insert id="insertOrUpdate">
+       insert into loadbalancers (<include refid="all_fields" /> )   
+       values  
+       (#{id}, #{name},#{tenant_id}, #{vip_address},#{vip_port_id},#{vip_subnet_id},#{floatingIp},#{operating_status},#{provisioning_status},
+       #{provider},#{listenerIds},#{poolIds},#{admin_state_up},#{millionSeconds},#{description})  
+        ON DUPLICATE KEY UPDATE
+        name=#{name},tenant_id=#{tenant_id},vip_address=#{vip_address},vip_port_id=#{vip_port_id},vip_subnet_id=#{vip_subnet_id},floatingIp=#{floatingIp},
+        operating_status=#{operating_status},provisioning_status=#{provisioning_status},provider=#{provider},listenerIds=#{listenerIds},
+        poolIds=#{poolIds},admin_state_up=#{admin_state_up},million_seconds=#{millionSeconds},description=#{description}
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Loadbalancer">
+        update loadbalancers set name=#{name},tenant_id=#{tenant_id},vip_address=#{vip_address},vip_port_id=#{vip_port_id},vip_subnet_id=#{vip_subnet_id},
+        floatingIp=#{floatingIp},operating_status=#{operating_status},provisioning_status=#{provisioning_status},provider=#{provider},listenerIds=#{listenerIds},
+        poolIds=#{poolIds},admin_state_up=#{admin_state_up},million_seconds=#{millionSeconds},description=#{description}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from loadbalancers where id =#{id}
+	</delete>
+      
+   <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from loadbalancers
+   </select>
+	
+   <!-- self dao -->
+	<select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from loadbalancers 
+    </select>
+    
+    <select id="selectByFloatingIP" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from loadbalancers where floatingIp = #{floatingIp}
+    </select>
+
+    <select id="selectAllByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from loadbalancers where tenant_id = #{tenant_id} order by million_seconds DESC
+    </select>
+    
+   	<select id="selectListWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from loadbalancers limit #{limit} 
+    </select>
+     
+    <select id="selectAllByTenantIdWithLimit" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from loadbalancers where tenant_id = #{0} order by million_seconds DESC limit #{1}
+    </select>
+    
+    <select id="selectAllForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from loadbalancers limit #{0}, #{1}
+    </select>  
+ 
+</mapper>

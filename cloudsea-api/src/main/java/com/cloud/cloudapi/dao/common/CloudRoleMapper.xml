@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.CloudRoleMapper">
+<!-- 
+      <typeAlias type="com.cloud.cloudapi.pojo.common.CloudRole" alias="cloudrole"/>
+-->
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.common.CloudRole">
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="rolename" property="roleName" jdbcType="VARCHAR" />
+        <result column="rolesign" property="roleSign" jdbcType="VARCHAR" />
+        <result column="display_permission" property="displayPermission" jdbcType="VARCHAR" />
+        <result column="operation_permission" property="operationPermission" jdbcType="VARCHAR" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        cloudrole.id,cloudrole.rolename,cloudrole.rolesign,cloudrole.display_permission,cloudrole.operation_permission,cloudrole.description
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from cloudrole where id=#{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.common.CloudRole">
+		insert into cloudrole ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{roleName}, #{roleSign}, #{displayPermission},#{operationPermission},#{description}
+		)
+	</insert>
+	
+    <insert id="insertOrUpdate">
+     insert into cloudrole (<include refid="all_fields" /> )   
+     values  
+     (#{id}, #{roleName}, #{roleSign}, #{displayPermission},#{operationPermission},#{description})  
+      ON DUPLICATE KEY UPDATE
+      rolename = #{rolename}, rolesign = #{rolesign},display_permission = #{displayPermission},operation_permission = #{operationPermission},description = #{description}
+	</insert>
+	
+	<insert id="insertOrUpdateBatch">
+       insert into cloudrole (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id}, #{item.roleName},#{item.roleSign}, #{item.displayPermission},#{item.operationPermission},#{item.description})    
+       </foreach> ON DUPLICATE KEY UPDATE
+        rolename=VALUES(rolename),rolesign=VALUES(rolesign),display_permission=VALUES(display_permission),
+        operation_permission=VALUES(operation_permission),description=VALUES(description)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.common.CloudRole">
+        update cloudrole set id = #{id}, rolename = #{roleName}, 
+        rolesign = #{roleSign}, display_permission=#{displayPermission},operation_permission=#{operationPermission},description=#{description}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from cloudrole where id =#{id}
+	</delete>
+  
+   <!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+		select count(*) as num from cloudrole
+	</select>
+	
+	
+    <select id="selectList" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from cloudrole 
+    </select>
+    
+    <select id="selectListForPage" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from cloudrole  limit #{0}, #{1}
+    </select>
+    
+    <select id="selectListByUserId" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from cloudrole,user_role
+	 where user_role.user_id=#{userid}
+	 and user_role.role_id=cloudrole.id
+    </select>
+    
+    <delete id= "deleteRolesFromUser" parameterType= "java.lang.String">
+       delete from user_role where user_id =#{userid}
+	</delete>
+	
+	<select id="getRoleIdByUserId" resultType="java.lang.String" parameterType= "java.lang.String">
+     select role_id from user_role where user_id=#{userid}
+    </select>
+    
+    <update id="updateRoleIdByUserId">
+      update user_role set role_id = #{0}, 
+      where user_id = #{1}
+    </update>
+    
+    <insert id="insertRoleToUser">
+		insert into user_role ( id,user_id,role_id)
+		values (
+		#{id}, #{userid}, #{roleid}
+		)
+	</insert>
+	
+	<select id="selectByRoleName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" />
+	 from cloudrole where rolename = #{roleName}
+    </select>
+    
+    <select id="selectRoleByIds" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from cloudrole
+	 where id in
+       <foreach collection="list" item="id" open="(" close=")" separator=",">
+         #{id}
+       </foreach>
+    </select>
+    
+</mapper>

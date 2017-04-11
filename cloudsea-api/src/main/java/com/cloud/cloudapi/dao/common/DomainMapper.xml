@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.DomainMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.common.Domain">
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+ 
+    <sql id="all_fields">
+        id,name,description,million_seconds
+	</sql>  
+	
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from domains where id=#{id}
+    </select>
+    
+    <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from domains where name=#{name}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.common.Domain">
+		insert into domains ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name}, #{description}, #{millionSeconds}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.common.Domain">
+        update domains set name = #{name}, description = #{description}, million_seconds = #{millionSeconds}
+        where id = #{id}
+    </update>
+     
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from domains where id = #{id}
+	</delete>
+	
+<!-- selt dao -->	
+    <select id="countNum" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select count(*) as num from domains where id = #{id}
+	</select>
+	
+    <select id="selectList" resultMap="BaseResultMap"> 
+     select <include refid="all_fields" /> from domains  order by million_seconds DESC
+    </select>
+
+</mapper>

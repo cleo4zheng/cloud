@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.MonitorHistoryMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.MonitorHistory">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="monitor_obj_id" property="monitorObjId" jdbcType="VARCHAR" />
+        <result column="data_time" property="dataTime" jdbcType="BIGINT" />
+        <result column="data_value" property="dataValue" jdbcType="VARCHAR" />
+        <result column="data_type" property="dataType" jdbcType="VARCHAR" />
+        <result column="data_unit" property="dataUnit" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id, monitor_obj_id,data_time,data_value,data_type,data_unit
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from monitor_history where id=#{id}
+    </select>
+    
+    <select id="selectListByMonitorObjIdAndDataTime" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from monitor_history where monitor_obj_id = #{monitor_obj_id} and data_time &gt; #{start_time} and data_time &lt;= #{end_time} and data_type = #{data_type} order by data_time asc
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Backup">
+		insert into monitor_history ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{monitor_obj_id}, #{data_time}, #{data_value}, #{data_type}, #{data_unit}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Backup">
+
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from monitor_history where id =#{id}
+	</delete>
+	
+</mapper>

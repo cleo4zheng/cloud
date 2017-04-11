@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.HostAggregateMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.HostAggregate">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="availability_zone" property="availabilityZone" jdbcType="VARCHAR" />
+        <result column="host_ids" property="hostIds" jdbcType="VARCHAR" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <result column="source" property="source" jdbcType="VARCHAR" />
+        <result column="service_id" property="serviceId" jdbcType="VARCHAR" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id, name, availability_zone,host_ids,description,source,service_id,million_seconds
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from host_aggregates where id=#{id}
+    </select>
+    
+    <select id="selectByServiceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from host_aggregates where service_id=#{serviceId}
+    </select>
+    
+    <select id="selectByZoneName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from host_aggregates where availability_zone=#{availabilityZone}
+    </select>
+    
+    <select id="selectByServiceIds" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from host_aggregates
+	 where service_id in
+      <foreach collection="list" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+    </select> 
+   
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Backup">
+		insert into host_aggregates ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name}, #{availabilityZone},#{hostIds},#{description},#{source},#{serviceId},#{millionSeconds}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+     insert into host_aggregates (<include refid="all_fields" /> )   
+     values  
+     (#{id}, #{name}, #{availabilityZone},#{hostIds},#{description},#{source},#{serviceId},#{millionSeconds})  
+      ON DUPLICATE KEY UPDATE
+      name = #{name}, availability_zone = #{availabilityZone},host_ids =#{hostIds},description = #{description},source=#{source},service_id=#{serviceId},million_seconds = #{millionSeconds}
+	</insert>
+	
+	<update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into host_aggregates (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id}, #{item.name},#{item.availabilityZone}, #{item.hostIds},#{item.description},#{item.source},#{item.serviceId},#{item.millionSeconds})    
+       </foreach> ON DUPLICATE KEY UPDATE
+        name=VALUES(name),availability_zone=VALUES(availability_zone),host_ids=VALUES(host_ids),description=VALUES(description),
+        source=VALUES(source),service_id=VALUES(service_id),million_seconds=VALUES(million_seconds)
+    </update> 
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Backup">
+        update host_aggregates set name = #{name},availability_zone = #{availabilityZone},host_ids =#{hostIds},description = #{description},source=#{source},service_id=#{serviceId},million_seconds = #{millionSeconds}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from host_aggregates where id =#{id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from host_aggregates
+	</select>
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from host_aggregates 
+    </select>
+    
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from host_aggregates  limit #{0}, #{1}
+    </select>    
+
+</mapper>

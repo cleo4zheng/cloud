@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.OperationLogMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.OperationLog">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="title" property="title" jdbcType="VARCHAR" />
+        <result column="user" property="user" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="details" property="details" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <result column="resources_id" property="resourcesId" jdbcType="VARCHAR" />
+        <result column="resource_type" property="resourceType" jdbcType="VARCHAR" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+
+    <sql id="all_fields">
+        id,title,user,status,details,tenant_id,resources_id,resource_type,million_seconds
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from operations where id=#{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.OperationLog">
+		insert into operations ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{title}, #{user}, #{status}, #{details}, #{tenantId},#{resourcesId},#{resourceType},#{millionSeconds}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.OperationLog">
+        update operations set title = #{title}, user = #{user},status = #{status},details = #{details},tenant_id = #{tenantId},
+        resources_id = #{resourcesId},resource_type = #{resourceType},million_seconds = #{millionSeconds}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from operations where id =#{id}
+	</delete>
+	
+    <delete id="deleteByOperationsId">
+     delete from operations
+	 where id in
+       <foreach collection="list" item="id" open="(" close=")" separator=",">
+         #{id}
+       </foreach>
+    </delete>
+    
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from operations
+	</select>
+	
+    <select id="selectAll" resultMap="BaseResultMap"  parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from operations where tenant_id = #{tenantId} order by million_seconds DESC
+    </select>
+    
+    <select id="selectListWithLimit" resultMap="BaseResultMap" >
+      select <include refid="all_fields" />
+	  from operations where tenant_id = #{0} order by million_seconds DESC limit #{1}
+    </select>
+    
+    <select id="countNumByOperationStatus" resultType="java.lang.Integer" parameterType="java.lang.String">
+	  select count(*) as num from operations where status =#{status}
+	</select>
+     
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from operations  limit #{0}, #{1}
+    </select>    
+
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.DataStoreVersionMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.foros.DataStoreVersion">
+	    <result column="version_id" property="version_id" jdbcType="VARCHAR" />
+        <result column="datastore_id" property="datastore_id" jdbcType="VARCHAR" />
+        <result column="version_name" property="version_name" jdbcType="VARCHAR" />
+        <result column="datastore_name" property="datastore_name" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        version_id, datastore_id, version_name, datastore_name, type
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from datastore_versions where version_id=#{version_id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.foros.DataStoreVersion">
+		insert into datastore_versions ( <include refid="all_fields" /> )
+		values (
+		#{version_id}, #{datastore_id}, #{version_name},#{datastore_name}, #{type}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.foros.DataStoreVersion">
+        update datastore_versions set datastore_id = #{datastore_id},version_name = #{version_name},datastore_name = #{datastore_name} , type = #{type}
+        where version_id = #{version_id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from datastore_versions where version_id = #{version_id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from datastore_versions
+	</select>
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from datastore_versions 
+    </select>
+    
+    
+    <select id="selectListWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from datastore_versions limit #{limit}
+    </select>
+     
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from dbs  limit #{0}, #{1}
+    </select>
+    
+    <select id="selectByDataStoreId" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from datastore_versions  where datastore_id =#{datastore_id}
+    </select>
+    
+    <select id="selectByDataStoreType" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from datastore_versions  where type =#{type}
+    </select>
+    
+    <insert id="insertOrUpdate">
+       insert into datastore_versions (<include refid="all_fields" /> )   
+       values  
+       (#{version_id}, #{datastore_id}, #{version_name},#{datastore_name}, #{type})  
+        ON DUPLICATE KEY UPDATE
+       datastore_id =#{datastore_id}, version_name =#{version_name}, datastore_name =#{datastore_name}, type =#{type}
+	</insert>  
+	
+	<update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into datastore_versions (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," > 
+         (#{item.version_id}, #{item.datastore_id}, #{item.version_name},#{item.datastore_name},#{item.type})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       datastore_id = VALUES(datastore_id), version_name = VALUES(version_name), datastore_name = VALUES(datastore_name), type = VALUES(type)
+    </update> 
+    
+    
+
+</mapper>

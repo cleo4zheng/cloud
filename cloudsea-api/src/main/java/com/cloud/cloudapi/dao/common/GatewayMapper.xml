@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.GatewayMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.Gateway">
+	    <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="network_id" property="network_id" jdbcType="VARCHAR" />
+        <result column="enable_snat" property="enable_snat" jdbcType="BOOLEAN" />
+        <result column="fixed_ids" property="fixedIds" jdbcType="VARCHAR" />
+    </resultMap>
+
+    
+    <sql id="all_fields">
+        id,network_id,enable_snat,fixed_ids
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from gateways where id=#{id}
+    </select>
+    
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Gateway">
+		insert into gateways ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{network_id},#{enable_snat}, #{fixedIds}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Gateway">
+        update gateways set network_id=#{network_id},enable_snat=#{enable_snat},fixed_ids=#{fixedIds}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from gateways where id =#{id}
+	</delete>
+  
+   <!-- self dao -->
+	<select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from gateways 
+    </select>
+     
+    <select id="selectListWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from gateways limit #{limit}
+    </select>
+         
+    <select id="selectAllForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from gateways  limit #{0}, #{1}
+    </select>  
+ 
+</mapper>

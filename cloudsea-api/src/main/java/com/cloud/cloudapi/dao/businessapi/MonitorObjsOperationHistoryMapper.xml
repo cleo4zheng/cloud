@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.businessapi.MonitorObjsOperationHistoryMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.businessapi.zabbix.MonitorObjsOperationHistory">
+	    <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="monitor_obj_id" property="monitorObjId" jdbcType="VARCHAR" />
+        <result column="monitor_id" property="monitorId" jdbcType="VARCHAR" />
+        <result column="monitor_type" property="monitorType" jdbcType="VARCHAR" />
+        <result column="operation_type" property="operationType" jdbcType="VARCHAR" />
+        <result column="operation_result" property="operationResult" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    
+    <sql id="all_fields_select">
+        id,monitor_obj_id,monitor_id,monitor_type,operation_type,operation_result,created_at,updated_at
+	</sql>
+	
+	 <sql id="all_fields_update">
+        monitor_obj_id,monitor_id,monitor_type,operation_type,operation_result
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields_select" /> from monitor_objs_operation_history where id=#{id} limit 1
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.businessapi.zabbix.MonitorObjsOperationHistory">
+		insert into monitor_objs_operation_history ( <include refid="all_fields_update" /> )
+		values (
+		#{monitorObjId}, #{monitorId},#{monitorType},#{operationType},#{operationResult}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.businessapi.zabbix.MonitorObjsOperationHistory">
+        update monitor_objs_operation_history set operation_type=#{operationResult}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from monitor_objs_operation_history where id =#{id}
+	</delete>
+  
+ 	 <insert id="insertSelectives" parameterType="java.util.List">
+		insert into monitor_objs_operation_history ( <include refid="all_fields_update" /> )
+		values
+		<foreach collection="list" item="item" index="index" separator="," > 
+         (#{item.monitorObjId}, #{item.monitorId}, #{item.monitorType}, #{item.operationType}, #{item.operationResult})
+       </foreach>
+	</insert>
+</mapper>

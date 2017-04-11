@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.VPNMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.VPN">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="tenant_id" property="tenant_id" jdbcType="VARCHAR" />
+        <result column="router_id" property="router_id" jdbcType="VARCHAR" />
+        <result column="subnet_id" property="subnet_id" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="ike_policy_id" property="ikePolicyId" jdbcType="VARCHAR"/>
+        <result column="ike_policy_name" property="ikePolicyName" jdbcType="VARCHAR"/> 
+        <result column="ipsec_policy_id" property="ipsecPolicyId" jdbcType="VARCHAR"/>
+        <result column="ipsec_policy_name" property="ipsecPolicyName" jdbcType="VARCHAR"/> 
+        <result column="ipsec_sitecon_id" property="ipsecSiteconId" jdbcType="VARCHAR"/>
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        id,name,status,tenant_id,router_id,subnet_id,description,ike_policy_id,ike_policy_name,ipsec_policy_id,ipsec_policy_name,ipsec_sitecon_id,million_seconds
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from vpns where id=#{id}
+    </select>
+    
+    <select id="selectVPNBySubetId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from vpns where subnet_id=#{subnet_id}
+    </select>
+
+    <select id="selectVPNByRouterId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from vpns where router_id=#{router_id}
+    </select>
+     
+    <select id="selectByIds" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from vpns e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+   <select id="selectListByTenantIds" resultMap="BaseResultMap">
+    select <include refid="all_fields" />
+	 from vpns
+	 where tenant_id in
+      <foreach collection="list" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+   </select> 
+      
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.VPN">
+		insert into vpns ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name},#{status},#{tenant_id}, #{router_id},#{subnet_id},#{description},#{ikePolicyId},#{ikePolicyName},#{ipsecPolicyId},#{ipsecPolicyName},#{ipsecSiteconId},#{millionSeconds}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into vpns (<include refid="all_fields" /> )   
+       values  
+       (#{id}, #{name},#{status}, #{tenant_id}, #{router_id},#{subnet_id},#{description},#{ikePolicyId},#{ikePolicyName},#{ipsecPolicyId},#{ipsecPolicyName},#{ipsecSiteconId},#{millionSeconds})  
+        ON DUPLICATE KEY UPDATE
+        name=#{name},status=#{status},tenant_id=#{tenant_id},router_id=#{router_id},subnet_id=#{subnet_id},description=#{description},ike_policy_id=#{ikePolicyId},
+        ike_policy_name=#{ikePolicyName},ipsec_policy_id=#{ipsecPolicyId},ipsec_policy_name=#{ipsecPolicyName},ipsec_sitecon_id=#{ipsecSiteconId},million_seconds=#{millionSeconds}
+	</insert>
+
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.VPN">
+        update vpns set name = #{name}, status=#{status},tenant_id = #{tenant_id},router_id = #{router_id},subnet_id = #{subnet_id},description = #{description},ike_policy_id=#{ikePolicyId},
+        ike_policy_name=#{ikePolicyName},ipsec_policy_id=#{ipsecPolicyId},ipsec_policy_name=#{ipsecPolicyName},ipsec_sitecon_id=#{ipsecSiteconId},million_seconds=#{millionSeconds}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from vpns where id =#{id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from vpns
+	</select>
+		
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from vpns 
+    </select>
+    
+    <select id="selectAllByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from vpns where tenant_id = #{tenant_id} order by million_seconds DESC
+    </select>
+    
+    <select id="selectAllForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from vpns limit #{0}, #{1}
+    </select>    
+
+</mapper>

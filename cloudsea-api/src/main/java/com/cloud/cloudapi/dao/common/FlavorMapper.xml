@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.FlavorMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.Flavor">
+	    <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="ram" property="ram" jdbcType="INTEGER" />
+        <result column="vcpus" property="vcpus" jdbcType="INTEGER" />
+        <result column="disk" property="disk" jdbcType="INTEGER" />
+        <result column="swap" property="swap" jdbcType="INTEGER" />
+        <result column="rxtx_factor" property="rxtx_factor" jdbcType="FLOAT" />
+        <result column="extra" property="extra" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="VARCHAR" />
+    </resultMap>
+
+    
+    <sql id="all_fields">
+        id,name,ram,vcpus,disk,swap,rxtx_factor,extra,type,created_at
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from flavors where id=#{id}
+    </select>
+    
+    <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from flavors where name=#{name}
+    </select>
+    
+    <select id="selectByType" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from flavors where type=#{type}
+    </select>
+    
+    <select id="selectByIds" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from flavors e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Flavor">
+		insert into flavors ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name},#{ram}, #{vcpus},#{disk},#{swap},#{rxtx_factor},#{extra},#{type},#{createdAt}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.Flavor">
+        update flavors set name=#{name},ram=#{ram},vcpus=#{vcpus},disk=#{disk},swap=#{swap},
+        rxtx_factor=#{rxtx_factor},extra=#{extra},type=#{type},created_at=#{createdAt}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from flavors where id =#{id}
+	</delete>
+  
+   <!-- self dao -->
+	<select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from flavors 
+    </select>
+    
+   	<select id="selectListWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from flavors limit #{limit} 
+    </select>
+     
+    <select id="selectAllForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from flavors  limit #{0}, #{1}
+    </select>  
+ 
+</mapper>

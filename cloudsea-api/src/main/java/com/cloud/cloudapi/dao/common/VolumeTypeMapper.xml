@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.VolumeTypeMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.VolumeType">
+	    <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="backend_name" property="backendName" jdbcType="VARCHAR" />
+         <result column="display_name" property="displayName" jdbcType="VARCHAR" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <result column="is_public" property="is_public" jdbcType="VARCHAR" />
+        <result column="unit_price" property="unitPrice" jdbcType="DOUBLE"/>
+    </resultMap>
+    
+    <sql id="all_fields">
+        id,name,backend_name,display_name,description,is_public,unit_price
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from volume_types where id=#{id}
+    </select>
+    
+   <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from volume_types where name=#{name}
+   </select>
+
+   <select id="selectByBackendName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from volume_types where backend_name=#{backendName}
+   </select>
+
+   <select id="selectVolumeTypesById" resultMap="BaseResultMap">
+      select <include refid="all_fields" /> from volume_types e where e.id in
+      <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+        #{id}
+      </foreach>
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.VolumeType">
+		insert into volume_types ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{name}, #{backendName},#{displayName},#{description}, #{is_public},#{unitPrice}
+		)
+	</insert>
+		
+   <insert id="insertOrUpdate">
+     insert into volume_types (<include refid="all_fields" /> )   
+     values  
+     (#{id}, #{name}, #{backendName},#{displayName},#{description},#{is_public},#{unitPrice})  
+      ON DUPLICATE KEY UPDATE
+      name = #{name}, backend_name = #{backendName},display_name=#{displayName},description = #{description},is_public = #{is_public},unit_price = #{unitPrice}
+	</insert>
+	
+	<update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into volume_types (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id},#{item.name},#{item.backendName},#{item.displayName},#{item.description},#{item.is_public},#{item.unitPrice})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       name = VALUES(name), backend_name = VALUES(backend_name), display_name = VALUES(display_name), 
+       description=VALUES(description), is_public=VALUES(is_public), unit_price=VALUES(unit_price)
+    </update> 
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.VolumeType">
+        update volume_types set name = #{name}, backend_name = #{backendName},display_name = #{displayName},description = #{description},is_public = #{is_public},unit_price = #{unitPrice}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from volume_types where id =#{id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from volume_types
+	</select>
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from volume_types 
+    </select>
+    
+    <select id="selectAllForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from volume_types limit #{0}, #{1}
+    </select>    
+
+</mapper>

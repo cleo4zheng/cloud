@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.StackResourceMapper" >
+  <resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.StackResource" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="stack_id" property="stackId" jdbcType="VARCHAR" />
+    <result column="resource_type" property="resourceType" jdbcType="VARCHAR" />
+    <result column="physical_resource_id" property="physicalResourceId" jdbcType="VARCHAR" />
+    <result column="required" property="required" jdbcType="VARCHAR" />
+    <result column="attributes" property="attributes" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="create_at" property="createdAt" jdbcType="VARCHAR" />
+    <result column="update_at" property="updatedAt" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, stack_id, resource_type, physical_resource_id, required, attributes, status, create_at, update_at
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from stack_resources
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByStackId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from stack_resources
+    where stack_id = #{stackId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from stack_resources
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByStackId" parameterType="java.lang.String" >
+    delete from stack_resources
+    where stack_id = #{stackId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.StackResource" >
+    insert into stack_resources (id, name, stack_id, resource_type, physical_resource_id, required, attributes, status, create_at, update_at)
+    values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{stackId,jdbcType=VARCHAR},
+      #{resourceType,jdbcType=VARCHAR}, #{physicalResourceId,jdbcType=VARCHAR}, #{required,jdbcType=VARCHAR},
+      #{attributes,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createdAt,jdbcType=VARCHAR}, #{updatedAt,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.StackResource" >
+    update stack_resources
+    set name = #{name,jdbcType=VARCHAR},
+      stack_id = #{stackId,jdbcType=VARCHAR},
+      resource_type = #{resourceType,jdbcType=VARCHAR},
+      physical_resource_id = #{physicalResourceId,jdbcType=VARCHAR},
+      required = #{required,jdbcType=VARCHAR},
+      attributes = #{attributes,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      create_at = #{createdAt,jdbcType=VARCHAR},
+      update_at = #{updatedAt,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

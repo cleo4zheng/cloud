@@ -1,0 +1,73 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>cloudsea-api</artifactId>
+	<packaging>war</packaging>
+	<url>http://maven.apache.org</url>
+
+	<parent>
+		<groupId>com.cloud</groupId>
+		<artifactId>cloudsea</artifactId>
+		<version>1.0</version>
+		<relativePath>../cloudsea</relativePath>
+	</parent>
+
+    <!-- workflow模块引用 -->
+ 	<dependencies>
+		<dependency>
+			<groupId>com.cloud</groupId>
+			<artifactId>cloudsea-workflow</artifactId>
+			<version>1.0</version>
+			<type>jar</type>
+		</dependency>
+	</dependencies>
+
+
+	<build>
+		<finalName>cloudsea-api</finalName>
+		<!-- 防止编译时,mybatis的xml文件无法引入 -->
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+					<include>**/*.json</include>
+					<include>**/*.config</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<!-- tomcat插件配置 -->
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<port>8080</port>
+					<path>/api</path>
+					<uriEncoding>UTF-8</uriEncoding>
+					<finalName>cloudsea-api</finalName>
+					<server>tomcat7</server>
+				</configuration>
+			</plugin>
+
+			<!-- 把JAR文件和标准的WAR文件同时安装到Maven仓库中 -->
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<attachClasses>true</attachClasses>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+

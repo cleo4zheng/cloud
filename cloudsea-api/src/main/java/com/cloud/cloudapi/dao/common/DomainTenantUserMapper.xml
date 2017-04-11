@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.DomainTenantUserMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.common.DomainTenantUser">
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="osdomainid" property="osdomainid" jdbcType="VARCHAR" />
+        <result column="ostenantid" property="ostenantid" jdbcType="VARCHAR" />
+        <result column="clouduserid" property="clouduserid" jdbcType="VARCHAR" />
+    </resultMap>
+ 
+    <sql id="all_fields">
+        id,osdomainid,ostenantid,clouduserid
+	</sql>  
+	
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from user_tenant_domain where id=#{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.common.DomainTenantUser">
+		insert into user_tenant_domain ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{osdomainid}, #{ostenantid},#{clouduserid}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.common.DomainTenantUser">
+        update user_tenant_domain set osdomainid = #{osdomainid}, ostenantid = #{ostenantid},clouduserid = #{clouduserid}
+        where id = #{id}
+    </update>
+     
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from user_tenant_domain where id =#{id}
+	</delete>
+	
+	<delete id= "deleteByTenantAndUserId" parameterType="java.lang.String">
+       delete from user_tenant_domain where  ostenantid=#{0} and clouduserid=#{1}
+	</delete>
+	
+<!-- selt dao -->	
+    <select id="countNum" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select count(*) as num from user_tenant_domain where id = #{id}
+	</select>
+	
+    <select id="selectListByUserId" resultMap="BaseResultMap" parameterType="java.lang.String"> 
+     select <include refid="all_fields" /> from user_tenant_domain where clouduserid=#{clouduserid}
+    </select>
+    
+    <select id="selectListByDomainId" resultMap="BaseResultMap" parameterType="java.lang.String"> 
+     select <include refid="all_fields" /> from user_tenant_domain where osdomainid=#{osdomainid}
+    </select>
+    
+    <select id="selectListByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String"> 
+     select <include refid="all_fields" /> from user_tenant_domain where ostenantid=#{ostenantid}
+    </select>
+    
+    <select id="selectListByTenantAndUserId" resultMap="BaseResultMap"> 
+     select <include refid="all_fields" /> from user_tenant_domain where ostenantid=#{0} and clouduserid=#{1}
+    </select>
+    
+</mapper>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.TemplateFieldMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.rating.TemplateField">
+	    <result column="field_id" property="field_id" jdbcType="VARCHAR" />
+	    <result column="field_code" property="field_code" jdbcType="VARCHAR" />
+	    <result column="default_chargekey" property="default_chargekey" jdbcType="VARCHAR" />
+        <result column="service_id" property="service_id" jdbcType="VARCHAR" />
+        <result column="rating" property="rating" jdbcType="BOOLEAN" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        field_id,field_code, default_chargekey,service_id,rating,million_seconds
+	</sql>
+	
+	<!-- basic super dao -->
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from template_fields where field_id=#{field_id}
+    </select>
+    
+    <select id="selectByFieldCodeAndServiceId" resultMap="BaseResultMap">
+     select <include refid="all_fields" /> from template_fields where field_code=#{0} and service_id=#{1}
+    </select>
+     
+   <select id="selectListByIds" resultMap="BaseResultMap">
+    select <include refid="all_fields" />
+	 from template_fields
+	 where field_id in
+      <foreach collection="list" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+   </select> 
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.rating.TemplateField">
+		insert into template_fields ( <include refid="all_fields" /> )
+		values (
+		#{field_id},#{field_code},#{default_chargekey},#{service_id},#{rating},#{millionSeconds}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into template_fields (<include refid="all_fields" /> )   
+       values  
+       (#{field_id},#{field_code},#{default_chargekey},#{service_id},#{rating},#{millionSeconds})  
+       ON DUPLICATE KEY UPDATE
+       field_code = #{field_code},default_chargekey = #{default_chargekey},service_id = #{service_id},rating=#{rating},million_seconds = #{millionSeconds}
+	</insert>
+	
+	<update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into template_fields (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.field_id},#{item.field_code}, #{item.default_chargekey},#{item.service_id}, #{item.rating},#{item.millionSeconds})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       field_code = VALUES(field_code),default_chargekey = VALUES(default_chargekey),service_id = VALUES(service_id), rating=VALUES(rating),million_seconds = VALUES(million_seconds)
+    </update>
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.rating.TemplateField">
+        update template_fields set field_code = #{field_code},default_chargekey = #{default_chargekey},service_id = #{service_id},rating=#{rating},million_seconds = #{millionSeconds}
+        where field_id = #{field_id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from template_fields where field_id =#{field_id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from template_fields
+	</select>
+	
+	<select id="selectFiledsByServiceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from template_fields where service_id = #{service_id}
+    </select>
+    
+    <select id="selectRatingFiledsByServiceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from template_fields where service_id = #{service_id} and rating=true
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from template_fields 
+    </select>
+    
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.ResourceMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.ResourceSpec">
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="total" property="total" jdbcType="INTEGER" />
+        <result column="used" property="used" jdbcType="INTEGER" />
+        <result column="type" property="type" jdbcType="VARCHAR" />  
+    </resultMap>
+
+    <sql id="all_fields">
+        id,name,total, used,type
+	</sql>
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from resource_quotas where id=#{id}
+    </select>
+    
+    <select id="selectByType" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from resource_quotas where type=#{type}
+    </select>
+    
+    <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from resource_quotas where name=#{name}
+    </select>
+    
+   <select id="findResourcesByNames" resultMap="BaseResultMap">
+       select <include refid="all_fields" /> 
+       from resource_quotas where name in
+       <foreach item="item" index="index" collection="list" 
+           open="(" separator="," close=")">
+                 #{item}
+       </foreach>
+  </select> 
+  
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.ResourceSpec">
+		insert into resource_quotas ( <include refid="all_fields" /> )
+		values (
+	    #{id},#{name}, #{total},#{used}, #{type}
+		)
+	</insert>
+	
+	<!-- 
+	<insert id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into resource_quotas (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id},#{item.name}, #{item.total},#{item.used}, #{item.type})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       name = #{item.name},total = #{item.total},used = #{item.used}, type = #{item.type}
+    </insert> 
+	 -->
+	 
+   <update id="insertOrUpdateBatch" parameterType="java.util.List">  
+       insert into resource_quotas (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+         (#{item.id},#{item.name}, #{item.total},#{item.used}, #{item.type})    
+       </foreach> ON DUPLICATE KEY UPDATE
+       name = VALUES(name),total = VALUES(total),used = VALUES(used), type = VALUES(type)
+    </update>
+    
+   <insert id="addResourcesBatch" parameterType="java.util.List">  
+       insert into resource_quotas (<include refid="all_fields" /> )   
+       values  
+       <foreach collection="list" item="item" index="index" separator="," >  
+        (#{item.id},#{item.name},#{item.total},#{item.used},#{item.type})  
+       </foreach>  
+    </insert> 
+    
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.ResourceSpec">
+        update resource_quotas set name = #{name},total = #{total},used = #{used}, type = #{type}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from resource_quotas where name =#{name}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from resource_quotas
+	</select>
+	
+	<select id="selectAllByTenantIdWithLimit" resultMap="BaseResultMap" >
+      select <include refid="all_fields" />
+	  from ports where tenant_id = #{0} limit #{1}
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from resource_quotas 
+    </select>
+    
+    <select id="selectListForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from resource_quotas  limit #{0}, #{1}
+    </select>    
+      
+</mapper>

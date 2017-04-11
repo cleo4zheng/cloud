@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.TemplateServiceMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.rating.TemplateService">
+	    <result column="service_id" property="service_id" jdbcType="VARCHAR" />
+	    <result column="service_code" property="service_code" jdbcType="VARCHAR" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        service_id,service_code, million_seconds
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.rating.TemplateService">
+		insert into template_services ( <include refid="all_fields" /> )
+		values (
+		#{service_id},#{service_code},#{millionSeconds}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into template_services (<include refid="all_fields" /> )   
+       values  
+       (#{service_id},#{service_code},#{millionSeconds})  
+       ON DUPLICATE KEY UPDATE
+       service_code = #{service_code},million_seconds = #{millionSeconds}
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.rating.TemplateService">
+        update template_services set service_code = #{service_code},million_seconds = #{millionSeconds}
+        where service_id = #{service_id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from template_services where service_id =#{service_id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from template_services
+	</select>
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from template_services where service_id=#{service_id}
+    </select>
+    
+    <select id="selectByServiceCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from template_services where service_code=#{service_code}
+    </select>
+	
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from template_services 
+    </select>
+    
+</mapper>

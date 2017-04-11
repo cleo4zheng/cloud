@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.CloudPermissionMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.common.CloudPermission">
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="permissionname" property="permissionName" jdbcType="VARCHAR" />
+        <result column="permissionsign" property="permissionSign" jdbcType="VARCHAR" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
+    </resultMap>
+    <!--  
+    <typeAlias type="com.cloud.cloudapi.pojo.common.CloudPermission" alias="cloudpermission"/> 
+    -->
+    <sql id="all_fields">
+        id,permissionname, permissionsign, description
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from cloudpermission where id=#{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.common.CloudPermission">
+		insert into cloudpermission ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{permissionname}, #{permissionsign}, #{description}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.common.CloudPermission">
+        update cloudpermission set id = #{id}, permissionname = #{permissionname}, 
+        permissionsign = #{permissionsign}, description=#{description}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from cloudpermission where id =#{id}
+	</delete>
+  
+   <!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+		select count(*) as num from cloudpermission
+	</select>
+	
+	
+    <select id="selectList" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from cloudpermission 
+    </select>
+    
+    <select id="selectListForPage" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from cloudpermission  limit #{0}, #{1}
+    </select>
+    
+    <select id="selectListByRoleId" resultMap="BaseResultMap">
+     select <include refid="all_fields" />
+	 from cloudpermission,role_permission
+	 where role_permission.role_id=#{roleid}
+	 and role_permission.permission_id=cloudpermission.id
+    </select>
+    
+     <delete id= "deletePermissionsFromRole" parameterType= "java.lang.String">
+       delete from role_permission where role_id =#{roleid}
+	</delete>
+	
+	<insert id="insertPermissionToRole">
+		insert into role_permission ( id,role_id, permission_id)
+		values (
+		#{id}, #{roleid}, #{permissionid}
+		)
+	</insert>
+    
+</mapper>

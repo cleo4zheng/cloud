@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.TemplateTenantMappingMapper">
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.rating.TemplateTenantMapping">
+	    <result column="tenant_mapping_id" property="tenant_mapping_id" jdbcType="VARCHAR" />
+	    <result column="tenant_id" property="tenant_id" jdbcType="VARCHAR" />
+        <result column="tenant_discount" property="tenant_discount" jdbcType="FLOAT" />
+        <result column="usethreshold" property="usethreshold" jdbcType="BOOLEAN" />
+        <result column="version_id" property="version_id" jdbcType="VARCHAR" />
+        <result column="template_id" property="template_id" jdbcType="VARCHAR" />
+        <result column="million_seconds" property="millionSeconds" jdbcType="BIGINT" />
+    </resultMap>
+    
+    <sql id="all_fields">
+        tenant_mapping_id,tenant_id,tenant_discount,usethreshold, version_id,template_id,million_seconds
+	</sql>
+	
+	<!-- basic super dao -->
+	
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.rating.TemplateTenantMapping">
+		insert into template_tenant_mappings ( <include refid="all_fields" /> )
+		values (
+		#{tenant_mapping_id},#{tenant_id},#{tenant_discount},#{usethreshold},#{version_id},#{template_id},#{millionSeconds}
+		)
+	</insert>
+	
+	<insert id="insertOrUpdate">
+       insert into template_tenant_mappings (<include refid="all_fields" /> )   
+       values  
+       (#{tenant_mapping_id},#{tenant_id},#{tenant_discount},#{usethreshold},#{version_id},#{template_id},#{millionSeconds})  
+       ON DUPLICATE KEY UPDATE
+       tenant_id = #{tenant_id},tenant_discount = #{tenant_discount},usethreshold=#{usethreshold},
+       version_id=#{version_id},template_id=#{template_id},million_seconds = #{millionSeconds}
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.rating.TemplateTenantMapping">
+        update template_tenant_mappings set  tenant_id = #{tenant_id},tenant_discount = #{tenant_discount},usethreshold=#{usethreshold},
+        version_id=#{version_id},template_id=#{template_id},million_seconds = #{millionSeconds}
+        where tenant_mapping_id = #{tenant_mapping_id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from template_tenant_mappings where tenant_mapping_id =#{tenant_mapping_id}
+	</delete>
+	
+	<!-- self dao -->
+    <select id="countNum" resultType="java.lang.Integer">
+	  select count(*) as num from template_tenant_mappings
+	</select>
+	
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from template_tenant_mappings where tenant_mapping_id=#{id}
+    </select>
+    
+   <select id="selectByTenantId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from template_tenant_mappings where tenant_id = #{tenant_id}
+    </select>
+    
+   <select id="selectByTemplateAndVersionId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from template_tenant_mappings where template_id = #{0} and version_id = #{1}
+    </select>
+    
+	<select id="selectByTemplateId" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select <include refid="all_fields" />
+	  from template_tenant_mappings where template_id = #{template_id}
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from template_tenant_mappings 
+    </select>
+    
+</mapper>

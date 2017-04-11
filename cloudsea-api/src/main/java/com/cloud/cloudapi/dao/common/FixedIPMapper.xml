@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.common.FixedIPMapper">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.openstackapi.forgui.FixedIP">
+	    <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="ip" property="ip" jdbcType="VARCHAR" />
+        <result column="subnet_id" property="subnet_id" jdbcType="BOOLEAN" />
+    </resultMap>
+
+    
+    <sql id="all_fields">
+        id,ip,subnet_id
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from fixedips where id=#{id}
+    </select>
+    
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.FixedIP">
+		insert into fixedips ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{ip},#{subnet_id}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.openstackapi.forgui.FixedIP">
+        update fixedips set ip=#{ip},subnet_id=#{subnet_id}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from fixedips where id =#{id}
+	</delete>
+  
+    <delete id="deleteFixedIPsById" >
+       delete from fixedips where id in
+       <foreach collection="array" item="id" index="index" open="(" close=")" separator=","> 
+       #{id}
+       </foreach>
+    </delete>
+    
+   <!-- self dao -->
+	<select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from fixedips 
+    </select>
+     
+    <select id="selectListWithLimit" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select <include refid="all_fields" />
+	  from fixedips limit #{limit}
+    </select>
+         
+    <select id="selectAllForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from fixedips  limit #{0}, #{1}
+    </select>  
+ 
+</mapper>

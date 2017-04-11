@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd 
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd 
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- 扫描controller（controller层注入） -->
+    <context:component-scan base-package="com.cloud.cloudapi">
+         <!-- 不扫描@Service注解，否则AOP无法使用 -->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+    </context:component-scan>
+<!--         <context:exclude-filter type="annotation" expression="com.cloud.cloudapi.openstackapi.controller.*"/>
+        <context:exclude-filter type="annotation" expression="com.cloud.cloudapi.businessapi.controller.*"/>
+    </context:component-scan> -->
+
+    <!-- 会自动注册DefaultAnnotationHandlerMapping与AnnotationMethodHandlerAdapter 两个bean,是spring MVC为@Controllers分发请求所必须的 -->
+    <mvc:annotation-driven></mvc:annotation-driven>
+    
+     <bean id="tokenInterceptor"
+            class="com.cloud.cloudapi.util.interceptor.TokenBasedAccessInterceptor">
+    </bean>
+    
+    <bean id="workflowInterceptor"
+            class="com.cloud.cloudapi.util.interceptor.WorkflowInterceptor">
+    </bean>
+    
+    <mvc:interceptors>
+        <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"/>
+        
+         <!-- 自定义拦截器 开始-->
+        <mvc:interceptor>
+               <mvc:mapping path="/**"/>
+               <mvc:exclude-mapping path="/auth/tokens"/>
+               <mvc:exclude-mapping path="/auth/sign-up"/>
+               <ref bean="tokenInterceptor"/>
+         </mvc:interceptor>
+         <!-- workflow 拦截器 -->
+          <mvc:interceptor>
+              <mvc:mapping path="/**"/>
+               <mvc:exclude-mapping path="/auth/tokens"/>
+               <mvc:exclude-mapping path="/auth/sign-up"/>
+               <ref bean="workflowInterceptor"/>
+         </mvc:interceptor>
+         <!-- 自定义拦截器 结束-->
+         
+    </mvc:interceptors>
+
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+        <property name="defaultLocale" value="zh_CN"/>
+    </bean>
+   
+    <bean id="handlerMapping"
+            class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+    </bean>
+
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+     <property name="messageConverters">
+       <list>
+         <ref bean="mappingJackson2HttpMessageConverter" />
+       </list>
+     </property>
+    </bean>
+    <!-- 支持返回json(避免IE在ajax请求时，返回json出现下载 ) -->
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="mappingJackson2HttpMessageConverter"/>
+            </list>
+        </property>
+    </bean>
+    <bean id="mappingJackson2HttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <value>text/plain;charset=UTF-8</value>
+                <value>application/json;charset=UTF-8</value>
+            </list>
+        </property>
+    </bean>
+    <!-- 支持返回json -->
+</beans>

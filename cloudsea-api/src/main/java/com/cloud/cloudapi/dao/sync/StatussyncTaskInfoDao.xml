@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cloud.cloudapi.dao.sync.StatussyncTaskInfoDao">
+
+	<resultMap id="BaseResultMap" type="com.cloud.cloudapi.pojo.businessapi.sync.StatussyncTaskInfo">
+	    <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="resource_uuid" property="resourceUuid" jdbcType="VARCHAR" />
+        <result column="resource_begin_status" property="resourceBeginStatus" jdbcType="VARCHAR" />
+        <result column="resource_target_status" property="resourceTargetStatus" jdbcType="VARCHAR" />
+        <result column="resource_end_status" property="resourceEndStatus" jdbcType="VARCHAR" />
+        <result column="resource_os_url" property="resourceOsUrl" jdbcType="VARCHAR" />
+        <result column="resource_os_key" property="resourceOsKey" jdbcType="VARCHAR" />
+        <result column="resource_db_table" property="resourceDbTable" jdbcType="VARCHAR" />
+        <result column="resource_db_column" property="resourceDbColumn" jdbcType="VARCHAR" />
+        <result column="sync_task_status" property="syncTaskStatus" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    
+    <sql id="all_fields">
+        id,resource_uuid,resource_begin_status,resource_target_status,resource_end_status,
+        resource_os_url,resource_os_key,resource_db_table,resource_db_column,sync_task_status
+	</sql>
+	
+	<!--basic super mapper -->
+    
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select <include refid="all_fields" /> from statussync_task_info where id=#{id}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.cloud.cloudapi.pojo.businessapi.sync.StatussyncTaskInfo">
+		insert into statussync_task_info ( <include refid="all_fields" /> )
+		values (
+		#{id}, #{resourceUuid},#{resourceBeginStatus},#{resourceTargetStatus},#{resourceEndStatus},#{resourceOsUrl},#{resourceOsKey}
+		,#{resourceDbTable},#{resourceDbColumn},#{syncTaskStatus}
+		)
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.cloud.cloudapi.pojo.businessapi.sync.StatussyncTaskInfo">
+        update statussync_task_info set resource_uuid=#{resourceUuid},resource_begin_status=#{resourceBeginStatus},resource_target_status=#{resourceTargetStatus},resource_end_status=#{resourceEndStatus},
+        resource_os_url=#{resourceOsUrl},resource_os_key=#{resourceOsKey},resource_db_table=#{resourceDbTable},resource_db_column=#{resourceDbColumn},sync_task_status=#{syncTaskStatus}
+        where id = #{id}
+    </update>
+    
+    <delete id= "deleteByPrimaryKey" parameterType="java.lang.String">
+       delete from statussync_task_info where id =#{id}
+	</delete>
+  
+   <!-- self dao -->
+	<select id="selectAll" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from statussync_task_info 
+    </select>
+     
+    <select id="selectAllForPage" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from statussync_task_info  limit #{0}, #{1}
+    </select>  
+    
+    <update id="updateTargetTable" >
+       update ${table} set ${column} = #{value} where id = #{id}
+    </update>
+    
+    
+    <select id="selectUnfinishedTasks" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from statussync_task_info where sync_task_status= 'running' or sync_task_status= 'retrying' or  sync_task_status= 'retryed'
+	  order by created_at
+    </select>
+    
+    
+     <select id="selectRetryingTasks" resultMap="BaseResultMap">
+      select <include refid="all_fields" />
+	  from statussync_task_info where sync_task_status= 'retrying'
+	  order by created_at
+    </select>
+ 
+</mapper>
